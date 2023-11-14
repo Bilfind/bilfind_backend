@@ -5,6 +5,7 @@ import Logging from "./utils/logging";
 import mongoose from "mongoose";
 import testRouter from "./routes/test";
 import authRouter from "./routes/auth";
+import cors from "cors";
 
 const app: Application = express();
 app.use(express.urlencoded({ extended: true }));
@@ -13,6 +14,8 @@ app.use(express.json());
 app.get("/", (req: Request, res: Response): void => {
   res.send("Server is active!");
 });
+
+app.use(cors());
 
 ///// Routes
 app.use("/test", testRouter);
