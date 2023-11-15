@@ -7,6 +7,22 @@ import { ObjectId, UpdateResult } from "mongodb";
 
 export class UserClient {
 
+  static async deleteUserByEmail(email: string): Promise<boolean> {
+    try {
+        const db = mongoose.connection.db;
+        const userCollection = db.collection("user");
+
+        const deleteResult = await userCollection.deleteOne({ email })
+
+        Logging.info("User is retrieved by email", email);
+    
+        return deleteResult.deletedCount > 0;
+      } catch (error) {
+        Logging.error(error);
+        return false;
+      }
+}
+
     static async getUserById(id: string): Promise<User | null> {
         try {
             const db = mongoose.connection.db;
