@@ -44,7 +44,7 @@ const postLogin = async (req: Request, res: Response) => {
         }])
     }
 
-    ApiHelper.getSuccessfulResponse(res, { message: "User successfully logged in", token: "DummyToken"});
+    ApiHelper.getSuccessfulResponse(res, { message: "User successfully logged in", token: "DummyToken", user});
   } catch (error) {
     Logging.error(error);
 
