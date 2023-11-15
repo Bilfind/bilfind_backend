@@ -3,7 +3,7 @@ import { User, UserStatus } from "../models/user-model";
 import { Mapper } from "../utils/mapper";
 import Logging from "../utils/logging";
 import { Departmant } from "../utils/enums";
-import { ObjectId } from "mongodb";
+import { ObjectId, UpdateResult } from "mongodb";
 
 export class UserClient {
 
@@ -43,6 +43,29 @@ export class UserClient {
             Logging.error(error);
             return null;
           }
+    }
+
+    static async updateStatus(email: string, status: UserStatus): Promise<boolean> {
+      try {
+        const db = mongoose.connection.db;
+        const userCollection = db.collection("user");
+        
+        const filter = { email };
+
+        const update = {
+          $set: {
+            latestStatus: status,
+          }
+        }
+        
+        const result: UpdateResult = await userCollection.updateOne(filter, update);
+        Logging.info("User successfully updated: ", status)
+
+        return result.modifiedCount > 0;
+      } catch (error) {
+        Logging.error(error);
+        return false;
+      }
     }
 
     static async createUser(email: string, hashedPassword: string, name: string, familyName: string, departmant: Departmant): Promise<ObjectId | null> {

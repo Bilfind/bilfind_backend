@@ -27,7 +27,7 @@ export class User {
 }
 
 export enum UserStatus {
-    WAITING,
-    VERIFIED,
-    BANNED
+    WAITING = "WAITING",
+    VERIFIED = "VERIFIED",
+    BANNED = "BANNED"
 }

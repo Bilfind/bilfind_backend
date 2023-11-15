@@ -4,12 +4,10 @@ import { Mapper } from "../../utils/mapper";
 import { ApiHelper } from "../../utils/api-helper";
 import Logging from "../../utils/logging";
 import { ApiErrorCode } from "../../utils/error-codes";
-import { Departmant } from "../../utils/enums";
 import { UserClient } from "../../clients/user-client";
-import { HashingHelper } from "../../utils/hashing-helper";
 import { IsNumber, IsString, validate } from "class-validator";
-import { MailHelper } from "../../utils/mail-helper";
 import { OtpClient } from "../../clients/otp-client";
+import { UserStatus } from "../../models/user-model";
 
 class PutVerifyRegistirationOtpRequest {
   @Expose()
@@ -50,7 +48,15 @@ const putVerifyRegistirationOtp = async (req: Request, res: Response) => {
         },
       ]);
     }
-    ApiHelper.getSuccessfulResponse(res, { message: "User successfully verified", user });
+    const successfullyUpdated = await UserClient.updateStatus(user.email, UserStatus.VERIFIED);
+    
+    if (successfullyUpdated) {
+      user.latestStatus = UserStatus.VERIFIED;
+      return ApiHelper.getSuccessfulResponse(res, { message: "User successfully verified", user });
+    }
+
+
+    return ApiHelper.getErrorResponseForCrash(res, "User status could not be updated");
   } catch (error) {
     Logging.error(error);
 
