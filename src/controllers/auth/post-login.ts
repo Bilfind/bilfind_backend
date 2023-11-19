@@ -4,12 +4,10 @@ import { Mapper } from "../../utils/mapper";
 import { ApiHelper } from "../../utils/api-helper";
 import Logging from "../../utils/logging";
 import { ApiErrorCode } from "../../utils/error-codes";
-import { Departmant } from "../../utils/enums";
 import { UserClient } from "../../clients/user-client";
 import { HashingHelper } from "../../utils/hashing-helper";
 import { IsString, validate } from "class-validator";
-import { MailHelper } from "../../utils/mail-helper";
-import { OtpClient } from "../../clients/otp-client";
+import { generateAuthenticationToken } from "../../utils/authentication-helper";
 
 class PostLoginRequest {
   @Expose()
@@ -44,7 +42,13 @@ const postLogin = async (req: Request, res: Response) => {
         }])
     }
 
-    ApiHelper.getSuccessfulResponse(res, { message: "User successfully logged in", token: "DummyToken", user});
+    const token = generateAuthenticationToken(user);
+
+    if (!token) {
+      return ApiHelper.getErrorResponseForCrash(res, "Authentication token could not be generated");
+    }
+
+    ApiHelper.getSuccessfulResponse(res, { message: "User successfully logged in", user, token});
   } catch (error) {
     Logging.error(error);
 

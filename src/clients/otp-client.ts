@@ -45,7 +45,6 @@ export class OtpClient {
       const otpCollection = db.collection("otp");
 
       const data = await otpCollection.findOne({ email }, { sort: { createdAt: -1} })
-      console.log(data);
       const otp : Otp = Mapper.map(Otp, data);
 
       if (!otp) {

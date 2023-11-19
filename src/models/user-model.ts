@@ -1,8 +1,9 @@
-import { Expose } from "class-transformer";
+import { Expose, Transform } from "class-transformer";
 import { Departmant } from "../utils/enums";
 import { ObjectId } from "mongodb";
 
 export class User {
+    @Transform((value) => value.obj._id.toString())
     @Expose()
     _id?: ObjectId;
 

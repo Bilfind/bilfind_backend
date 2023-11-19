@@ -1,6 +1,7 @@
 import express from "express";
 import getTest from "../controllers/test/get-test";
 import { Request, Response } from "express";
+import { isAuth } from "../utils/authentication-helper";
 
 const testRouter = express.Router();
 
@@ -10,5 +11,6 @@ testRouter.get("/",  (req: Request, res: Response): void => {
   });
 
 testRouter.get("/test", getTest);
+testRouter.get("/admin", isAuth, getTest);
 
 export default testRouter;

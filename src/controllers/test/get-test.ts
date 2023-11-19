@@ -5,6 +5,7 @@ import { ApiHelper } from "../../utils/api-helper";
 import * as _ from "lodash";
 import Logging from "../../utils/logging";
 import { ApiErrorCode } from "../../utils/error-codes";
+import { User } from "../../models/user-model";
 
 class GetTestRequest {
   @Expose()
@@ -16,6 +17,8 @@ const getTest = (req: Request, res: Response) => {
   Logging.info(JSON.stringify(req.query, Object.getOwnPropertyNames(req.query)));
 
   try {
+    // @ts-ignore
+    const user: User = req.locals.user;
     const getTestRequest: GetTestRequest = Mapper.map(GetTestRequest, req.query);
 
     if (getTestRequest.errorRequest === "true") {
@@ -27,7 +30,7 @@ const getTest = (req: Request, res: Response) => {
       ]);
     }
 
-    ApiHelper.getSuccessfulResponse(res, { message: "successfully passed the test!" });
+    ApiHelper.getSuccessfulResponse(res, { message: "successfully passed the test!" , user});
   } catch (error) {
     Logging.error(error);
 

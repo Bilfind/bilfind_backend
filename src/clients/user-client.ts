@@ -31,6 +31,11 @@ export class UserClient {
             const data = await userCollection.findOne({_id: new mongoose.Types.ObjectId(id)})
     
             const user: User = Mapper.map(User, data);
+            if (!user) {
+              Logging.error("User not found with id " + id);
+              return null;
+            }
+
             Logging.info("User is retrieved by id {}", id);
         
             return user;
@@ -46,6 +51,8 @@ export class UserClient {
             const userCollection = db.collection("user");
     
             const data = await userCollection.findOne({email})
+            
+            console.log(data);
     
             const user: User = Mapper.map(User, data);
             if (!user) {

@@ -1,5 +1,6 @@
 import { createTransport } from "nodemailer";
 import { Otp } from "../models/otp-model";
+import Logging from "./logging";
 
 export class MailHelper {
     public static sendMail(to: string, content: string, subject: string) {
@@ -21,9 +22,9 @@ export class MailHelper {
   
       transporter.sendMail(mailOptions, (error, info) => {
         if (error) {
-          console.log(error);
+          Logging.error(error);
         } else {
-          console.log("Email sent: " + info.response);
+          Logging.log("Email sent: " + info.response);
         }
       });
     }

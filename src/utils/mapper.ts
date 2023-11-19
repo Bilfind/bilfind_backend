@@ -3,7 +3,6 @@ import { classToPlain, plainToClass } from "class-transformer";
 import { validateSync, ValidationError } from "class-validator";
 import * as _ from "lodash";
 import { ApiErrorCode } from "./error-codes";
-import Logging from "./logging";
 
 export class Mapper {
   static map(classToMap: any, data: any): any {

@@ -65,6 +65,17 @@ export class ApiHelper {
     return this.getErrorResponse(res, 400, errorResponse);
   }
 
+  static getErrorResponseForUnauthorized(res: Response) {
+    const errorResponse: ApiError[] = [
+      {
+        errorCode: ApiErrorCode.UNAUTHORIZED,
+        message: "Authentication failed.",
+      },
+    ];
+
+    return this.getErrorResponse(res, 401, errorResponse);
+  }
+
   static isInvalidRequestBodyError(error: any): boolean {
     return error && error.message && _.toString(error.message).includes(ApiErrorCode.INVALID_REQUEST_BODY);
   }
