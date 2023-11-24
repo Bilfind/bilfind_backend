@@ -25,6 +25,8 @@ export class User {
     @Expose()
     latestStatus: UserStatus;
 
+    @Expose()
+    favoritePostIds: string[];
 }
 
 export enum UserStatus {

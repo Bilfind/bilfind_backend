@@ -102,7 +102,8 @@ export class UserClient {
                 name,
                 familyName,
                 departmant,
-                latestStatus: UserStatus.WAITING
+                latestStatus: UserStatus.WAITING,
+                favoritePostIds: []
             }
             
             const result = await userCollection.insertOne(user);

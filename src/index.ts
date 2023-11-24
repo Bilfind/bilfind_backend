@@ -6,6 +6,7 @@ import mongoose from "mongoose";
 import testRouter from "./routes/test";
 import authRouter from "./routes/auth";
 import cors from "cors";
+import postRouter from "./routes/post";
 
 const app: Application = express();
 app.use(express.urlencoded({ extended: true }));
@@ -20,6 +21,7 @@ app.use(cors());
 ///// Routes
 app.use("/test", testRouter);
 app.use("/auth", authRouter);
+app.use("/post", postRouter);
 
 ///// Start Server
 app.listen(config.port, async () => {
