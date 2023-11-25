@@ -6,6 +6,7 @@ import Logging from "../../utils/logging";
 import { IsString } from "class-validator";
 import { User } from "../../models/user-model";
 import { PostClient } from "../../clients/post-client";
+import { Multer } from "multer";
 
 export class EditPostRequest {
   @Expose()
@@ -13,11 +14,9 @@ export class EditPostRequest {
   postId: string;
 
   @Expose()
-  @IsString()
   title?: string;
 
   @Expose()
-  @IsString()
   content?: string;
 
   @Expose()
@@ -38,10 +37,18 @@ const editPostHandler = async (req: Request, res: Response) => {
     const user: User = locals.user;
     const userId = user._id!.toString();
 
-    const updated = await PostClient.editPost(
-      editPostRequest, 
-      userId
-    );
+    const files = req.files;
+    console.log(files);
+
+    const images: string[] = editPostRequest.images ?? [];
+    if (files && typeof files.length === "number") {
+      for (let i = 0; i < (files.length as number); i++) {
+        const file = (files as any[])[i];
+        images.push(file.location);
+      }
+    }
+    editPostRequest.images = images;
+    const updated = await PostClient.editPost(editPostRequest, userId);
 
     if (!updated) {
       return ApiHelper.getErrorResponseForCrash(res, "Post could not be edited");

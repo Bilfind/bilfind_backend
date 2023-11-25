@@ -5,8 +5,24 @@ import { Otp, OtpType } from "../models/otp-model";
 import { ObjectId } from "mongodb";
 import { PostModel, PostType } from "../models/post-model";
 import { EditPostRequest } from "../controllers/post/edit-post-handler";
+import { GetPostListRequest } from "../controllers/post/get-post-list-handler";
 
 export class PostClient {
+  static async getPosts(getPostListRequest: GetPostListRequest) {
+    const db = mongoose.connection.db;
+    const postCollection = db.collection("post");
+    const filter: any = {};
+
+    if (getPostListRequest.type) {
+      filter.type = getPostListRequest.type;
+    }
+
+    const dataCursor = postCollection.find(filter, { sort: { createdAt: -1 } });
+    const posts = (await dataCursor.toArray()).map((dataItem) => Mapper.map(PostModel, dataItem));
+
+    return posts;
+  }
+
   static async createPost(
     title: string,
     content: string,

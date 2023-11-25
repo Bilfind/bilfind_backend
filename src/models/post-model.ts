@@ -3,7 +3,7 @@ import { IsEnum } from "class-validator";
 import { ObjectId } from "mongodb";
 
 export enum PostType {
-  SALE = "SALEmı3",
+  SALE = "SALE",
   BORROW = "BORROW",
   DONATION = "DONATION",
   FOUND = "FOUND",

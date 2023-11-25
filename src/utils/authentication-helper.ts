@@ -12,6 +12,7 @@ const SECRET_KEY = process.env.SECRET_KEY;
 
 export class RequestLocals {
     user: User | null | undefined
+    email?: string
 }
 
 export const generateAuthenticationToken = (user: User) => {
@@ -63,7 +64,8 @@ export const isAuth = async (req: Request, res: Response, next: NextFunction) =>
 
     const user = await UserClient.getUserById(tokenMetadata.user_id);
     const locals: RequestLocals = {
-        user: user
+        user: user,
+        email: user?.email,
     }
 
     // @ts-ignore
