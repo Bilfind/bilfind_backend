@@ -1,0 +1,72 @@
+Part B - Evaluation (10 points)
+Your evaluation of these languages in terms of readability and writability of 
+list operations. Discuss, in your opinion, which language is the best in terms of Boolean expresssions.
+
+
+In writability, the biggest difference in these languages is converting non-boolean values into boolean if they are used in place of boolean.
+For example lets suppose getUser() can return a UserModel or a null value if there is not any user.
+
+const user = getUser();
+
+it is realy easier to check whether user is null or not by just putting it inside the if statement and if userModel does not exists, returning error.
+
+if (!user) {
+    return "user not found";
+}
+
+But in the languages like dart that does not allow one to use non-boolean values inside if statement, the check should be done like:
+
+if (user == null) {
+    return "user not found";
+}
+
+But by accepting non-boolean values inside if statements, languages like javaScript sacrifice some readability values because user == null is mor
+understandable than !user in just a quick look.
+
+The second difference in these languages is the signs of logical operations. It is comprehensive to use && as and, || as or, and ! as logical not. However, in python
+they are represented by "and", "or", and "not". However, even though this design desicion probably made for increasing the readability of code, it makes code more complicated
+by opposing the general design practices. For example:
+    if not isEmpty and name == "Serhat" and not skipThis
+is only more readible for people who does not know how to write code. Instead,
+    if(!isEmpty && name=="Serhat" && !skipThis)
+is more readible for a programmer 
+
+Additionally, even though every programming languages in our list gives higher precedence to && than ||, allowing to use different operations in one if statement
+without requiring them to be grouped decreases the readability. For example
+
+if (false || false && true) { } 
+
+Writing the above if statement like the below can increase the readability even though it does not affect the result.
+
+if (false || (false && true)) { }
+
+
+
+////////////////////////////////////////////////////////////////////////////
+
+Part C - Learning strategy (10 points)
+A learning strategy is an individual's approach to completing a task. In this section, discuss, in detail, the material and tools you used,
+and the experiments you performed. Also talk about personal communication, if you had.
+Give the URLs of the online compiler/interpreters you used to run your programs.
+
+In this homework, it is easier to understand the terms, precedence rules, associativity and short-circuit logics for one spesific language
+and then compare the rules you find with other languages. For this purpose, I have decided to use javaScript as my first language to learn them comprehensively.
+I decided this language because it is one of the most spread languages that it is used for almost every platform like mobile development, web development, backend and so on.
+Also it has very clear and detailed documentation to explain these terms.
+https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Operator_precedence
+It waws also important to test my findings easily. NodeJs was installed in my computer, therefore running codes was very quick. node run test.js
+After I understood the idea of these terms by reading and testing the codes, it was the time for applying these things to different languages and reading their documentation.
+Python, Dart, Ruby and JavaScript was installed in my comptuer. Therefore I didn't use online compilers for these languages.
+For other languages, I have used following online compilers:
+Go -> https://www.programiz.com/golang/online-compiler/
+Rust -> https://www.programiz.com/rust/online-compiler/
+Lua -> https://www.tutorialspoint.com/execute_lua_online.php
+The websites that I learned these terms:
+Go -> https://go.dev/ref/spec
+Rust -> https://doc.rust-lang.org/reference/expressions.html
+JavaScript -> https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Operator_precedence
+Lua -> https://www.lua.org/pil/3.5.html
+Dart -> https://dart.dev/language/operators
+Ruby -> https://ruby-doc.org/core-2.6.2/doc/syntax/precedence_rdoc.html
+Python -> https://docs.python.org/3/reference/expressions.html
+
