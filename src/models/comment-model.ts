@@ -71,7 +71,7 @@ export const mapToCommentResponseDTO = (commentModel: CommentModel, user: User):
         ...commentModel,
         id: commentModel._id!.toString(),
         ownerPhoto: user.profilePhoto,
-        ownerName: user.email,
+        ownerName: user.name + " " + user.familyName,
         ownerDepartment: user.departmant,
         ownerEmail: user.email,
     });
