@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { mongo } from "mongoose";
 import { User, UserStatus } from "../models/user-model";
 import { Mapper } from "../utils/mapper";
 import Logging from "../utils/logging";
@@ -131,5 +131,51 @@ export class UserClient {
             Logging.error(error);
             return null;
           }
+    }
+
+    static async userPutFavorite(userId: string, postId: string) {
+      try {
+        const db = mongoose.connection.db;
+        const userCollection = db.collection("user");
+        
+        const filter = { _id: new mongoose.Types.ObjectId(userId)};
+
+        const update = {
+          $push: {
+            favoritePostIds: postId,
+          }
+        }
+        
+        const result: UpdateResult = await userCollection.updateOne(filter, update);
+        Logging.info("User favorites successfully updated");
+
+        return result.modifiedCount > 0;
+      } catch (error) {
+        Logging.error(error);
+        return false;
+      }
+    }
+
+    static async userDeleteFavorite(userId: string, postId: string) {
+      try {
+        const db = mongoose.connection.db;
+        const userCollection = db.collection("user");
+        
+        const filter = { _id: new mongoose.Types.ObjectId(userId)};
+
+        const update = {
+          $pull: {
+            favoritePostIds: postId,
+          }
+        }
+        
+        const result: UpdateResult = await userCollection.updateOne(filter, update);
+        Logging.info("User favorites successfully updated");
+
+        return result.modifiedCount > 0;
+      } catch (error) {
+        Logging.error(error);
+        return false;
+      }
     }
 }
