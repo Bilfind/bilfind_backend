@@ -1,6 +1,9 @@
 import { Expose, Transform } from "class-transformer";
 import { IsEnum } from "class-validator";
 import { ObjectId } from "mongodb";
+import { Departmant } from "../utils/enums";
+import { User } from "./user-model";
+import { Mapper } from "../utils/mapper";
 
 export enum PostType {
   SALE = "SALE",
@@ -35,6 +38,59 @@ export class PostModel {
   createdAt: Date;
 
   @Expose()
+  isDeleted: boolean;
+
+  @Expose()
   @IsEnum(PostType)
   type: PostType;
+}
+
+export class PostResponseDTO {
+  @Expose()
+  id: String;
+
+  @Expose()
+  userId: string;
+
+  @Expose()
+  title: string;
+
+  @Expose()
+  content: string;
+
+  @Expose()
+  images?: string[];
+
+  @Expose()
+  price?: number;
+
+  @Expose()
+  createdAt: Date;
+
+  @Expose()
+  @IsEnum(PostType)
+  type: PostType;
+
+  @Expose()
+  ownerPhoto?: string;
+
+  @Expose()
+  ownerName: string;
+
+  @Expose()
+  ownerEmail: string;
+
+  @Expose()
+  ownerDepartment: Departmant;
+}
+
+export const mapToPostResponseDTO = (postModel: PostModel, user: User): PostResponseDTO => {
+  return Mapper.map(PostResponseDTO, {
+      ...postModel,
+      id: postModel._id!.toString(),
+      ownerPhoto: user.profilePhoto,
+      ownerName: user.email,
+      ownerDepartment: user.departmant,
+      ownerEmail: user.email,
+  });
 }

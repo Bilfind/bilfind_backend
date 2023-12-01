@@ -7,7 +7,8 @@ import { IsString } from "class-validator";
 import { User } from "../../models/user-model";
 import { PostClient } from "../../clients/post-client";
 import { Multer } from "multer";
-import { PostModel, PostType } from "../../models/post-model";
+import { PostModel, PostType, mapToPostResponseDTO } from "../../models/post-model";
+import { UserClient } from "../../clients/user-client";
 
 export class GetPostListRequest {
   @Expose()
@@ -28,7 +29,13 @@ const getPostListHandler = async (req: Request, res: Response) => {
 
     const postList: PostModel[] = await PostClient.getPosts(getPostListRequest);
 
-    return ApiHelper.getSuccessfulResponse(res, postList);
+    const postOwnerIdList = postList.map(post => post.userId);
+    const users = await UserClient.getUsersByListId(postOwnerIdList);
+    const userMap: Record<string, User> = {};
+    users.forEach((user) => userMap[user._id!.toString()] = user);
+    const getPostDTOList = postList.map(post => mapToPostResponseDTO(post, userMap[post.userId])); 
+
+    return ApiHelper.getSuccessfulResponse(res, {posts: getPostDTOList});
   } catch (error) {
     Logging.error(error);
 

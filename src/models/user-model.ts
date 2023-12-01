@@ -17,6 +17,9 @@ export class User {
     name: string;
 
     @Expose()
+    profilePhoto?: string;
+
+    @Expose()
     familyName: string;
 
     @Expose()

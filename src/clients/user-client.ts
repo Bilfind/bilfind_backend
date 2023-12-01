@@ -45,6 +45,23 @@ export class UserClient {
           }
     }
 
+    static async getUsersByListId(idList: string[]): Promise<User[]> {
+      try {
+          const db = mongoose.connection.db;
+          const userCollection = db.collection("user");
+  
+          const dataCursor = userCollection.find({_id: {$in: idList.map(id => new mongoose.Types.ObjectId(id))}})
+          const users = (await dataCursor.toArray()).map((dataItem) => Mapper.map(User, dataItem));
+         
+          Logging.info("Users are retrieved by id {}", idList);
+      
+          return users;
+        } catch (error) {
+          Logging.error(error);
+          return [];
+        }
+  }
+
     static async getUserByEmail(email: string): Promise<User | null> {
         try {
             const db = mongoose.connection.db;

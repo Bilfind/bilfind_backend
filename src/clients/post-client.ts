@@ -1,28 +1,81 @@
 import mongoose from "mongoose";
 import { Mapper } from "../utils/mapper";
 import Logging from "../utils/logging";
-import { Otp, OtpType } from "../models/otp-model";
 import { ObjectId } from "mongodb";
 import { PostModel, PostType } from "../models/post-model";
 import { EditPostRequest } from "../controllers/post/edit-post-handler";
 import { GetPostListRequest } from "../controllers/post/get-post-list-handler";
+import { PostCommentRequest } from "../controllers/post/post-comment-handler";
+import { CommentModel } from "../models/comment-model";
+import { User } from "../models/user-model";
 
 export class PostClient {
-  static async getPosts(getPostListRequest: GetPostListRequest) {
-    const db = mongoose.connection.db;
-    const postCollection = db.collection("post");
-    const filter: any = {};
+  static async getCommentById(commentId: string): Promise<CommentModel | null> {
+    try {
+      const db = mongoose.connection.db;
+      const commentCollection = db.collection("comment");
 
-    if (getPostListRequest.type) {
-      filter.type = getPostListRequest.type;
+      const data = await commentCollection.findOne({ _id: new mongoose.Types.ObjectId(commentId), isDeleted: false});
+
+      const comment: CommentModel = Mapper.map(CommentModel, data);
+      if (!comment) {
+        Logging.error("Comment not found with id " + commentId);
+        return null;
+      }
+
+      Logging.info("Comment is retrieved by id {}", commentId);
+
+      return comment;
+    } catch (error) {
+      Logging.error(error);
+      return null;
     }
-
-    const dataCursor = postCollection.find(filter, { sort: { createdAt: -1 } });
-    const posts = (await dataCursor.toArray()).map((dataItem) => Mapper.map(PostModel, dataItem));
-
-    return posts;
   }
 
+  static async getPostComments(postId: string): Promise<CommentModel[]> {
+    try {
+      const db = mongoose.connection.db;
+      const commentCollection = db.collection("comment");
+
+      const dataCursor = commentCollection.find({ postId, isDeleted: false});
+      const postComments = (await dataCursor.toArray()).map((dataItem) => Mapper.map(CommentModel, dataItem));
+
+      return postComments;
+    } catch (error) {
+      Logging.error(error);
+      return [];
+    }
+  }
+
+  static async createComment(
+    postCommentRequest: PostCommentRequest,
+    user: User
+  ): Promise<ObjectId | null> {
+    try {
+      const db = mongoose.connection.db;
+      const commentCollection = db.collection("comment");
+
+      const comment: CommentModel = {
+        content: postCommentRequest.content,
+        postId: postCommentRequest.postId,
+        rate: postCommentRequest.rate,
+        userId: user._id!.toString(),
+        parentId: postCommentRequest.parentId,
+        createdAt: new Date(),
+        isDeleted: false,
+      };
+
+      const result = await commentCollection.insertOne(comment);
+      Logging.info("Comment successfully created by id: ", result.insertedId._id.toString());
+
+      return result.insertedId._id;
+    } catch (error) {
+      Logging.error(error);
+      return null;
+    }
+  }
+
+  // Post
   static async createPost(
     title: string,
     content: string,
@@ -43,6 +96,7 @@ export class PostClient {
         userId,
         images: images,
         createdAt: new Date(),
+        isDeleted: false,
       };
 
       const result = await postCollection.insertOne(post);
@@ -53,6 +107,22 @@ export class PostClient {
       Logging.error(error);
       return null;
     }
+  }
+
+  static async getPosts(getPostListRequest: GetPostListRequest) {
+    const db = mongoose.connection.db;
+    const postCollection = db.collection("post");
+    const filter: any = { isDeleted: false };
+
+    if (getPostListRequest.type) {
+      filter.type = getPostListRequest.type;
+    }
+
+
+    const dataCursor = postCollection.find(filter, { sort: { createdAt: -1 } });
+    const posts = (await dataCursor.toArray()).map((dataItem) => Mapper.map(PostModel, dataItem));
+
+    return posts;
   }
 
   static async editPost(eidtPostFilter: EditPostRequest, userId: string): Promise<boolean> {
@@ -85,7 +155,7 @@ export class PostClient {
       const db = mongoose.connection.db;
       const postCollection = db.collection("post");
 
-      const data = await postCollection.findOne({ _id: new mongoose.Types.ObjectId(id) });
+      const data = await postCollection.findOne({ _id: new mongoose.Types.ObjectId(id), isDeleted: false });
 
       const post: PostModel = Mapper.map(PostModel, data);
       if (!post) {
