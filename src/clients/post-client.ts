@@ -147,6 +147,31 @@ export class PostClient {
     return posts;
   }
 
+  static async getPostsByIdList(postIdList: string[]) {
+    const db = mongoose.connection.db;
+    const postCollection = db.collection("post");
+
+    const objectIdList = postIdList.map((postId) => new mongoose.Types.ObjectId(postId));
+    const filter: any = { isDeleted: false, _id: {$in: objectIdList} };
+
+    const dataCursor = postCollection.find(filter, { sort: { createdAt: -1 } });
+    const posts = (await dataCursor.toArray()).map((dataItem) => Mapper.map(PostModel, dataItem));
+
+    return posts;
+  }
+
+  static async getPostsByUserId(userId: string) {
+    const db = mongoose.connection.db;
+    const postCollection = db.collection("post");
+
+    const filter: any = { isDeleted: false, userId: userId };
+
+    const dataCursor = postCollection.find(filter, { sort: { createdAt: -1 } });
+    const posts = (await dataCursor.toArray()).map((dataItem) => Mapper.map(PostModel, dataItem));
+
+    return posts;
+  }
+
   static async editPost(eidtPostFilter: EditPostRequest, userId: string): Promise<boolean> {
     try {
       const db = mongoose.connection.db;

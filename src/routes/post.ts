@@ -7,12 +7,14 @@ import getPostListHandler from "../controllers/post/get-post-list-handler";
 import postCommentHandler from "../controllers/post/post-comment-handler";
 import getPostDetailHandler from "../controllers/post/get-post-detail-handler";
 import deleteCommentHandler from "../controllers/post/delete-comment-handler";
+import getUserPostsHandler from "../controllers/post/get-user-posts";
 
 const postRouter = express.Router();
 
 postRouter.post("", isAuth, createPostHandler);
 postRouter.put("", isAuth, imageUpload.array("image"), editPostHandler);
 postRouter.get("/list", isAuth, getPostListHandler);
+postRouter.get("/user", isAuth, getUserPostsHandler);
 postRouter.get("/:postId/", isAuth, getPostDetailHandler);
 postRouter.post("/comment", isAuth, postCommentHandler);
 postRouter.delete("/comment", isAuth, deleteCommentHandler);
