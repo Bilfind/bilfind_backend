@@ -19,9 +19,6 @@ export class PostCommentRequest {
   @Expose()
   @IsString()
   content: string;
-
-  @Expose()
-  rate: number;
 }
 
 // base endpoint structure

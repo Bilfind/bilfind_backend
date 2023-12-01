@@ -29,7 +29,7 @@ const getPostDetailHandler = async (req: Request, res: Response) => {
     const userMap: Record<string, User> = {};
     users.forEach((user) => userMap[user._id!.toString()] = user);
     
-    const getCommentDTOList = comments.map(comment => mapToCommentResponseDTO(comment, userMap[post.userId])); 
+    const getCommentDTOList = comments.map(comment => mapToCommentResponseDTO(comment, userMap[comment.userId])); 
     
     const owner = await UserClient.getUserById(post.userId);
     const postResponseDTO = mapToPostResponseDTO(post, owner!);

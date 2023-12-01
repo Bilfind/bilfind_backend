@@ -58,7 +58,6 @@ export class PostClient {
       const comment: CommentModel = {
         content: postCommentRequest.content,
         postId: postCommentRequest.postId,
-        rate: postCommentRequest.rate,
         userId: user._id!.toString(),
         parentId: postCommentRequest.parentId,
         createdAt: new Date(),

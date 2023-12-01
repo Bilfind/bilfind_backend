@@ -22,9 +22,6 @@ export class CommentModel {
     content: string;
 
     @Expose()
-    rate: number;
-
-    @Expose()
     createdAt: Date;
 
     @Expose()
@@ -46,9 +43,6 @@ export class CommentResponseDTO {
 
     @Expose()
     content: string;
-
-    @Expose()
-    rate: number;
 
     @Expose()
     createdAt: Date;
