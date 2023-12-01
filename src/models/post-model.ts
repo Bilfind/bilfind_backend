@@ -89,7 +89,7 @@ export const mapToPostResponseDTO = (postModel: PostModel, user: User): PostResp
       ...postModel,
       id: postModel._id!.toString(),
       ownerPhoto: user.profilePhoto,
-      ownerName: user.email,
+      ownerName: user.name + " " + user.familyName,
       ownerDepartment: user.departmant,
       ownerEmail: user.email,
   });
