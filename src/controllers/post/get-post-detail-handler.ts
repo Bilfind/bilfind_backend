@@ -13,7 +13,7 @@ const getPostDetailHandler = async (req: Request, res: Response) => {
     const { postId } = req.params;
 
     if (!postId) {
-        ApiHelper.getErrorResponseForCrash(res, "Post Id must be given");
+        return ApiHelper.getErrorResponseForCrash(res, "Post Id must be given");
     }
 
     const post = await PostClient.getPostById(postId);
@@ -22,7 +22,7 @@ const getPostDetailHandler = async (req: Request, res: Response) => {
         return ApiHelper.getErrorResponseForCrash(res, "Post could not be found");
     }
 
-    const comments = await PostClient.getPostComments(post.userId); 
+    const comments = await PostClient.getPostComments(post._id!.toString()); 
     const commentOwnerIdList = comments.map(comment => comment.userId);
     const users = await UserClient.getUsersByListId(commentOwnerIdList);
     const userMap: Record<string, User> = {};

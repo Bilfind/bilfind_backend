@@ -75,6 +75,28 @@ export class PostClient {
     }
   }
 
+  static async deleteComment(commentId: string): Promise<boolean> {
+    try {
+      const db = mongoose.connection.db;
+      const commentCollection = db.collection("comment");
+
+      const filter = { $or: [{_id: new mongoose.Types.ObjectId(commentId)}, {parentId: commentId }] };
+      const update = {
+        $set: {
+          isDeleted: true,
+        },
+      };
+      const data = await commentCollection.updateMany(filter, update);
+
+      Logging.info("Comments are deleted by id {}", commentId);
+
+      return data.modifiedCount > 0;
+    } catch (error) {
+      Logging.error(error);
+      return false;
+    }
+  }
+
   // Post
   static async createPost(
     title: string,

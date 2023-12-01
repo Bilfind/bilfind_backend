@@ -37,6 +37,16 @@ const editPostHandler = async (req: Request, res: Response) => {
     const user: User = locals.user;
     const userId = user._id!.toString();
 
+    const post = await PostClient.getPostById(editPostRequest.postId);
+
+    if (!post) {
+        return ApiHelper.getErrorResponseForCrash(res, "Post could not be found");
+    }
+
+    if (userId !== post.userId) {
+      return ApiHelper.getErrorResponseForCrash(res, "Post does not belong to this user");
+  }
+
     const files = req.files;
     console.log(files);
 
@@ -54,13 +64,13 @@ const editPostHandler = async (req: Request, res: Response) => {
       return ApiHelper.getErrorResponseForCrash(res, "Post could not be edited");
     }
 
-    const post = await PostClient.getPostById(editPostRequest.postId);
+    const postUpdated = await PostClient.getPostById(editPostRequest.postId);
 
-    if (!post) {
+    if (!postUpdated) {
       return ApiHelper.getErrorResponseForCrash(res, "Post could not be edited");
     }
 
-    return ApiHelper.getSuccessfulResponse(res, post);
+    return ApiHelper.getSuccessfulResponse(res, { post: postUpdated });
   } catch (error) {
     Logging.error(error);
 
