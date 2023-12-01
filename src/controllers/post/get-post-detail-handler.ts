@@ -5,6 +5,7 @@ import { PostClient } from "../../clients/post-client";
 import { UserClient } from "../../clients/user-client";
 import { User } from "../../models/user-model";
 import { mapToCommentResponseDTO } from "../../models/comment-model";
+import { mapToPostResponseDTO } from "../../models/post-model";
 
 // base endpoint structure
 const getPostDetailHandler = async (req: Request, res: Response) => {
@@ -31,7 +32,8 @@ const getPostDetailHandler = async (req: Request, res: Response) => {
     const getCommentDTOList = comments.map(comment => mapToCommentResponseDTO(comment, userMap[post.userId])); 
     
     const owner = await UserClient.getUserById(post.userId);
-    return ApiHelper.getSuccessfulResponse(res, {post, comments: getCommentDTOList, owner});
+    const postResponseDTO = mapToPostResponseDTO(post, owner!);
+    return ApiHelper.getSuccessfulResponse(res, {post: postResponseDTO, comments: getCommentDTOList, owner});
   } catch (error) {
     Logging.error(error);
 
