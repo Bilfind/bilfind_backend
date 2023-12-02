@@ -18,6 +18,9 @@ export class User {
     name: string;
 
     @Expose()
+    createdAt: Date;
+
+    @Expose()
     profilePhoto?: string;
 
     @Expose()
@@ -31,6 +34,9 @@ export class User {
 
     @Expose()
     favoritePostIds: string[];
+
+    @Expose()
+    ownPostIds: string[];
 }
 
 export class UserResponseDTO {
@@ -50,6 +56,9 @@ export class UserResponseDTO {
     familyName: string;
 
     @Expose()
+    createdAt: Date;
+
+    @Expose()
     departmant: Departmant;
 
     @Expose()
@@ -57,6 +66,9 @@ export class UserResponseDTO {
 
     @Expose()
     favoritePostIds: string[];
+
+    @Expose()
+    ownPostIds: string[];
 }
 
 export const mapToUserResponseDTO = (user: User): UserResponseDTO => {

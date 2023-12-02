@@ -7,6 +7,7 @@ import { IsEnum, IsString } from "class-validator";
 import { User } from "../../models/user-model";
 import { PostClient } from "../../clients/post-client";
 import { PostType } from "../../models/post-model";
+import { UserClient } from "../../clients/user-client";
 
 class CreatePostRequest {
   @Expose()
@@ -53,6 +54,11 @@ const createPostHandler = async (req: Request, res: Response) => {
 
     if (!post) {
       return ApiHelper.getErrorResponseForCrash(res, "Post could not be created");
+    }
+
+    const userUpdated = await UserClient.userPutOwnPost(userId, post._id!.toString());
+    if (!userUpdated) {
+      return ApiHelper.getErrorResponseForCrash(res, "Post could not be added to users own posts");
     }
 
     return ApiHelper.getSuccessfulResponse(res, post);

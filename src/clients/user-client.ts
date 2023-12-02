@@ -1,4 +1,4 @@
-import mongoose, { mongo } from "mongoose";
+import mongoose from "mongoose";
 import { User, UserStatus } from "../models/user-model";
 import { Mapper } from "../utils/mapper";
 import Logging from "../utils/logging";
@@ -119,8 +119,10 @@ export class UserClient {
                 name,
                 familyName,
                 departmant,
+                createdAt: new Date(),
                 latestStatus: UserStatus.WAITING,
-                favoritePostIds: []
+                favoritePostIds: [],
+                ownPostIds: []
             }
             
             const result = await userCollection.insertOne(user);
@@ -156,6 +158,29 @@ export class UserClient {
       }
     }
 
+    static async userPutOwnPost(userId: string, postId: string) {
+      try {
+        const db = mongoose.connection.db;
+        const userCollection = db.collection("user");
+        
+        const filter = { _id: new mongoose.Types.ObjectId(userId)};
+
+        const update = {
+          $push: {
+            ownPostIds: postId,
+          }
+        }
+        
+        const result: UpdateResult = await userCollection.updateOne(filter, update);
+        Logging.info("User own posts successfully updated");
+
+        return result.modifiedCount > 0;
+      } catch (error) {
+        Logging.error(error);
+        return false;
+      }
+    }
+
     static async userDeleteFavorite(userId: string, postId: string) {
       try {
         const db = mongoose.connection.db;
@@ -171,6 +196,29 @@ export class UserClient {
         
         const result: UpdateResult = await userCollection.updateOne(filter, update);
         Logging.info("User favorites successfully updated");
+
+        return result.modifiedCount > 0;
+      } catch (error) {
+        Logging.error(error);
+        return false;
+      }
+    }
+
+    static async userDeletOwnPosts(userId: string, postId: string) {
+      try {
+        const db = mongoose.connection.db;
+        const userCollection = db.collection("user");
+        
+        const filter = { _id: new mongoose.Types.ObjectId(userId)};
+
+        const update = {
+          $pull: {
+            ownPostIds: postId,
+          }
+        }
+        
+        const result: UpdateResult = await userCollection.updateOne(filter, update);
+        Logging.info("User own posts successfully updated");
 
         return result.modifiedCount > 0;
       } catch (error) {
