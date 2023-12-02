@@ -3,7 +3,7 @@ import { ApiHelper } from "../../utils/api-helper";
 import Logging from "../../utils/logging";
 import { PostClient } from "../../clients/post-client";
 import { UserClient } from "../../clients/user-client";
-import { User } from "../../models/user-model";
+import { User, mapToUserResponseDTO } from "../../models/user-model";
 import { mapToCommentResponseDTO } from "../../models/comment-model";
 import { mapToPostResponseDTO } from "../../models/post-model";
 
@@ -32,8 +32,9 @@ const getPostDetailHandler = async (req: Request, res: Response) => {
     const getCommentDTOList = comments.map(comment => mapToCommentResponseDTO(comment, userMap[comment.userId])); 
     
     const owner = await UserClient.getUserById(post.userId);
+    const ownerResponseDTO = mapToUserResponseDTO(owner!);
     const postResponseDTO = mapToPostResponseDTO(post, owner!);
-    return ApiHelper.getSuccessfulResponse(res, {post: postResponseDTO, comments: getCommentDTOList, owner});
+    return ApiHelper.getSuccessfulResponse(res, {post: postResponseDTO, comments: getCommentDTOList, owner: ownerResponseDTO});
   } catch (error) {
     Logging.error(error);
 

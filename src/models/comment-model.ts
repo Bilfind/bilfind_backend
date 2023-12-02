@@ -20,7 +20,7 @@ export class CommentModel {
 
     @Expose()
     content: string;
-
+ 
     @Expose()
     createdAt: Date;
 

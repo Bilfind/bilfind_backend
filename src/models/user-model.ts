@@ -1,6 +1,7 @@
 import { Expose, Transform } from "class-transformer";
 import { Departmant } from "../utils/enums";
 import { ObjectId } from "mongodb";
+import { Mapper } from "../utils/mapper";
 
 export class User {
     @Transform((value) => value.obj._id.toString())
@@ -30,6 +31,39 @@ export class User {
 
     @Expose()
     favoritePostIds: string[];
+}
+
+export class UserResponseDTO {
+    @Expose()
+    id: String;
+
+    @Expose()
+    email: string;
+
+    @Expose()
+    name: string;
+
+    @Expose()
+    profilePhoto?: string;
+
+    @Expose()
+    familyName: string;
+
+    @Expose()
+    departmant: Departmant;
+
+    @Expose()
+    latestStatus: UserStatus;
+
+    @Expose()
+    favoritePostIds: string[];
+}
+
+export const mapToUserResponseDTO = (user: User): UserResponseDTO => {
+    return Mapper.map(User, {
+        ...user,
+        id: user._id!.toString(),
+    });
 }
 
 export enum UserStatus {

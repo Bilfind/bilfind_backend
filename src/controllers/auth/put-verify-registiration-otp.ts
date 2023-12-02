@@ -7,7 +7,7 @@ import { ApiErrorCode } from "../../utils/error-codes";
 import { UserClient } from "../../clients/user-client";
 import { IsNumber, IsString, validate } from "class-validator";
 import { OtpClient } from "../../clients/otp-client";
-import { UserStatus } from "../../models/user-model";
+import { UserStatus, mapToUserResponseDTO } from "../../models/user-model";
 
 class PutVerifyRegistirationOtpRequest {
   @Expose()
@@ -52,7 +52,8 @@ const putVerifyRegistirationOtp = async (req: Request, res: Response) => {
     
     if (successfullyUpdated) {
       user.latestStatus = UserStatus.VERIFIED;
-      return ApiHelper.getSuccessfulResponse(res, { message: "User successfully verified", user });
+      const userResponseDTO = mapToUserResponseDTO(user);
+      return ApiHelper.getSuccessfulResponse(res, { message: "User successfully verified", user: userResponseDTO });
     }
 
 

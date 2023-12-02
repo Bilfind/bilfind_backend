@@ -8,6 +8,7 @@ import { UserClient } from "../../clients/user-client";
 import { HashingHelper } from "../../utils/hashing-helper";
 import { IsString, validate } from "class-validator";
 import { generateAuthenticationToken } from "../../utils/authentication-helper";
+import { mapToUserResponseDTO } from "../../models/user-model";
 
 class PostLoginRequest {
   @Expose()
@@ -48,7 +49,8 @@ const postLogin = async (req: Request, res: Response) => {
       return ApiHelper.getErrorResponseForCrash(res, "Authentication token could not be generated");
     }
 
-    ApiHelper.getSuccessfulResponse(res, { message: "User successfully logged in", user, token});
+    const userResponseDTO = mapToUserResponseDTO(user);
+    ApiHelper.getSuccessfulResponse(res, { message: "User successfully logged in", user: userResponseDTO, token});
   } catch (error) {
     Logging.error(error);
 
