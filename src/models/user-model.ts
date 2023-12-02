@@ -60,7 +60,7 @@ export class UserResponseDTO {
 }
 
 export const mapToUserResponseDTO = (user: User): UserResponseDTO => {
-    return Mapper.map(User, {
+    return Mapper.map(UserResponseDTO, {
         ...user,
         id: user._id!.toString(),
     });
