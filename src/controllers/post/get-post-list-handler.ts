@@ -10,10 +10,7 @@ import { UserClient } from "../../clients/user-client";
 
 export class GetPostListRequest {
   @Expose()
-  title?: string;
-
-  @Expose()
-  content?: string;
+  key?: string;
 
   @Expose()
   type?: PostType;

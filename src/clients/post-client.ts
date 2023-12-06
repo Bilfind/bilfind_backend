@@ -133,10 +133,25 @@ export class PostClient {
   static async getPosts(getPostListRequest: GetPostListRequest) {
     const db = mongoose.connection.db;
     const postCollection = db.collection("post");
-    const filter: any = { isDeleted: false };
+    let filter: any = { isDeleted: false };
 
     if (getPostListRequest.type) {
       filter.type = getPostListRequest.type;
+    }
+
+    if (getPostListRequest.key) {
+      const regex = new RegExp(getPostListRequest.key!);
+      filter = {
+        ...filter,
+        $or: [
+          {
+            content: { $regex: regex }
+          },
+          {
+            title: { $regex: regex }
+          }
+        ]
+      }
     }
 
 
@@ -181,7 +196,7 @@ export class PostClient {
         $set: {
           title: eidtPostFilter.title,
           content: eidtPostFilter.content,
-          price: eidtPostFilter.price,
+          price: eidtPostFilter.price ? +eidtPostFilter.price : null,
           images: eidtPostFilter.images,
         },
       };
