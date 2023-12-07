@@ -4,7 +4,7 @@ import Logging from "../utils/logging";
 import { ObjectId } from "mongodb";
 import { PostModel, PostType } from "../models/post-model";
 import { EditPostRequest } from "../controllers/post/edit-post-handler";
-import { GetPostListRequest } from "../controllers/post/get-post-list-handler";
+import { SearchFilterModel } from "../controllers/post/get-post-list-handler";
 import { PostCommentRequest } from "../controllers/post/post-comment-handler";
 import { CommentModel } from "../models/comment-model";
 import { User } from "../models/user-model";
@@ -130,17 +130,30 @@ export class PostClient {
     }
   }
 
-  static async getPosts(getPostListRequest: GetPostListRequest) {
+  static async getPosts(searchFilterModel: SearchFilterModel) {
     const db = mongoose.connection.db;
     const postCollection = db.collection("post");
     let filter: any = { isDeleted: false };
 
-    if (getPostListRequest.types) {
-      filter.type = {$in: getPostListRequest.types!};
+    if (searchFilterModel.types && searchFilterModel.types.length > 0) {
+      filter.type = { $in: searchFilterModel.types };
+    }
+  
+    if (searchFilterModel.minPrice !== undefined) {
+      filter.price = { $gte: searchFilterModel.minPrice };
+    }
+  
+    if (filter.maxPrice !== undefined) {
+      filter.price = { ...filter.price, $lte: searchFilterModel.maxPrice };
+    }
+  
+
+    if (searchFilterModel.types) {
+      filter.type = {$in: searchFilterModel.types!};
     }
 
-    if (getPostListRequest.key) {
-      const regex = new RegExp(getPostListRequest.key!);
+    if (searchFilterModel.key) {
+      const regex = new RegExp(searchFilterModel.key!);
       filter = {
         ...filter,
         $or: [
@@ -153,7 +166,6 @@ export class PostClient {
         ]
       }
     }
-
 
     const dataCursor = postCollection.find(filter, { sort: { createdAt: -1 } });
     const posts = (await dataCursor.toArray()).map((dataItem) => Mapper.map(PostModel, dataItem));

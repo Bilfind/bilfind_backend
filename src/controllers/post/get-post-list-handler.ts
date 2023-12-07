@@ -8,12 +8,18 @@ import { PostClient } from "../../clients/post-client";
 import { PostModel, PostType, mapToPostResponseDTO } from "../../models/post-model";
 import { UserClient } from "../../clients/user-client";
 
-export class GetPostListRequest {
+export class SearchFilterModel {
   @Expose()
-  key?: string;
+  public key?: string;
+  
+  @Expose()
+  public types?: string[];
 
   @Expose()
-  types?: string[];
+  public minPrice?: number;
+
+  @Expose()
+  public maxPrice?: number;
 }
 
 // base endpoint structure
@@ -21,19 +27,9 @@ const getPostListHandler = async (req: Request, res: Response) => {
   try {
     let {key, types} = req.query;
 
-    console.log(types, "types");
+    const searchFilterModel: SearchFilterModel = mapQueryToFilter(req.query);
 
-    if (key && typeof key !== "string") {
-      return ApiHelper.getErrorResponseForInvalidRequestBody(res);
-    }
-
-    if (types) {
-      if (!types.length) {
-        types = [`${types}`];
-      }
-    }
-
-    const postList: PostModel[] = await PostClient.getPosts({key, types: types as string[]});
+    const postList: PostModel[] = await PostClient.getPosts(searchFilterModel);
 
     const postOwnerIdList = postList.map(post => post.userId);
     const users = await UserClient.getUsersByListId(postOwnerIdList);
@@ -51,5 +47,14 @@ const getPostListHandler = async (req: Request, res: Response) => {
     ApiHelper.getErrorResponseForCrash(res, JSON.stringify(Object.getOwnPropertyNames(req)));
   }
 };
+
+function mapQueryToFilter(query: any): SearchFilterModel {
+  return {
+    key: query.key as string,
+    types: Array.isArray(query.types) ? query.types : undefined,
+    minPrice: query.minPrice ? parseInt(query.minPrice as string, 10) : undefined,
+    maxPrice: query.maxPrice ? parseInt(query.maxPrice as string, 10) : undefined,
+  };
+}
 
 export default getPostListHandler;
