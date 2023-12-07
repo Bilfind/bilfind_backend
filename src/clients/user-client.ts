@@ -67,7 +67,7 @@ export class UserClient {
         const db = mongoose.connection.db;
         const userCollection = db.collection("user");
 
-        const regex = new RegExp(key);
+        const regex = new RegExp(key, "i");
         const filter = {
           $or: [
             {

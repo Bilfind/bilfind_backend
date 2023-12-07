@@ -152,7 +152,7 @@ export class PostClient {
     }
 
     if (searchFilterModel.key) {
-      const regex = new RegExp(searchFilterModel.key!);
+      const regex = new RegExp(searchFilterModel.key!, "i");
       const or: any = {
         $or: [
           {
