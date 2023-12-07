@@ -143,10 +143,9 @@ export class PostClient {
       filter.price = { $gte: searchFilterModel.minPrice };
     }
   
-    if (filter.maxPrice !== undefined) {
+    if (searchFilterModel.maxPrice !== undefined) {
       filter.price = { ...filter.price, $lte: searchFilterModel.maxPrice };
-    }
-  
+    }  
 
     if (searchFilterModel.types) {
       filter.type = {$in: searchFilterModel.types!};

@@ -25,8 +25,6 @@ export class SearchFilterModel {
 // base endpoint structure
 const getPostListHandler = async (req: Request, res: Response) => {
   try {
-    let {key, types} = req.query;
-
     const searchFilterModel: SearchFilterModel = mapQueryToFilter(req.query);
 
     const postList: PostModel[] = await PostClient.getPosts(searchFilterModel);
@@ -52,8 +50,8 @@ function mapQueryToFilter(query: any): SearchFilterModel {
   return {
     key: query.key as string,
     types: Array.isArray(query.types) ? query.types : undefined,
-    minPrice: query.minPrice ? parseInt(query.minPrice as string, 10) : undefined,
-    maxPrice: query.maxPrice ? parseInt(query.maxPrice as string, 10) : undefined,
+    minPrice: query.minPrice ? parseInt(query.minPrice as string) : undefined,
+    maxPrice: query.maxPrice ? parseInt(query.maxPrice as string) : undefined,
   };
 }
 
