@@ -153,8 +153,7 @@ export class PostClient {
 
     if (searchFilterModel.key) {
       const regex = new RegExp(searchFilterModel.key!);
-      filter = {
-        ...filter,
+      const or: any = {
         $or: [
           {
             content: { $regex: regex }
@@ -164,7 +163,22 @@ export class PostClient {
           }
         ]
       }
+      if (searchFilterModel.userIdList) {
+        or.$or.push({
+          userId : {$in: searchFilterModel.userIdList!}
+        });
+      }
+      filter = {
+        ...filter,
+        ...or,
+      }
     }
+
+    
+
+    console.log("searchFilterModel");
+    console.log(searchFilterModel);
+    console.log(filter.$or);
 
     const dataCursor = postCollection.find(filter, { sort: { createdAt: -1 } });
     const posts = (await dataCursor.toArray()).map((dataItem) => Mapper.map(PostModel, dataItem));

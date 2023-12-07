@@ -62,6 +62,40 @@ export class UserClient {
         }
   }
 
+  static async getUsersByRegex(key: string): Promise<User[]> {
+    try {
+        const db = mongoose.connection.db;
+        const userCollection = db.collection("user");
+
+        const regex = new RegExp(key);
+        const filter = {
+          $or: [
+            {
+              email: { $regex: regex }
+            },
+            {
+              name: { $regex: regex }
+            },
+            {
+              familyName: { $regex: regex }
+            }
+          ]
+        };
+
+        console.log("filter", filter.$or);
+
+        const dataCursor = userCollection.find(filter)
+        const users = (await dataCursor.toArray()).map((dataItem) => Mapper.map(User, dataItem));
+       
+        Logging.info("Users are retrieved by key ", key);
+    
+        return users;
+      } catch (error) {
+        Logging.error(error);
+        return [];
+      }
+}
+
     static async getUserByEmail(email: string): Promise<User | null> {
         try {
             const db = mongoose.connection.db;

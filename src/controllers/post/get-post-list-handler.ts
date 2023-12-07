@@ -7,10 +7,14 @@ import { User } from "../../models/user-model";
 import { PostClient } from "../../clients/post-client";
 import { PostModel, PostType, mapToPostResponseDTO } from "../../models/post-model";
 import { UserClient } from "../../clients/user-client";
+import { ObjectId } from "mongodb";
 
 export class SearchFilterModel {
   @Expose()
   public key?: string;
+
+  @Expose()
+  public userIdList?: ObjectId[];
   
   @Expose()
   public types?: string[];
@@ -26,6 +30,16 @@ export class SearchFilterModel {
 const getPostListHandler = async (req: Request, res: Response) => {
   try {
     const searchFilterModel: SearchFilterModel = mapQueryToFilter(req.query);
+    if (searchFilterModel.key) {
+      const userKey = extractUsername(searchFilterModel.key);
+      console.log(userKey);
+      if (userKey) {
+        console.log("anan");
+        const users = await UserClient.getUsersByRegex(userKey);
+        console.log(users);
+        searchFilterModel.userIdList = users.map((user) => user._id!);
+      }
+    }
 
     const postList: PostModel[] = await PostClient.getPosts(searchFilterModel);
 
@@ -49,10 +63,18 @@ const getPostListHandler = async (req: Request, res: Response) => {
 function mapQueryToFilter(query: any): SearchFilterModel {
   return {
     key: query.key as string,
-    types: Array.isArray(query.types) ? query.types : undefined,
+    types: Array.isArray(query.types) ? query.types : typeof query.types === "string" ? [query.types] : undefined,
     minPrice: query.minPrice ? parseInt(query.minPrice as string) : undefined,
     maxPrice: query.maxPrice ? parseInt(query.maxPrice as string) : undefined,
   };
+}
+
+function extractUsername(inputString: string): string | null {
+  const regex = /@([a-zA-Z0-9_]+)/;
+  const match = inputString.match(regex);
+
+  // If there is a match, return the captured group (anyname), otherwise return null
+  return match ? match[1] : null;
 }
 
 export default getPostListHandler;
