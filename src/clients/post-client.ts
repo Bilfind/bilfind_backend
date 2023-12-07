@@ -135,8 +135,8 @@ export class PostClient {
     const postCollection = db.collection("post");
     let filter: any = { isDeleted: false };
 
-    if (getPostListRequest.type) {
-      filter.type = getPostListRequest.type;
+    if (getPostListRequest.types) {
+      filter.type = {$in: getPostListRequest.types!};
     }
 
     if (getPostListRequest.key) {

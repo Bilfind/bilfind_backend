@@ -13,16 +13,27 @@ export class GetPostListRequest {
   key?: string;
 
   @Expose()
-  type?: PostType;
+  types?: string[];
 }
 
 // base endpoint structure
 const getPostListHandler = async (req: Request, res: Response) => {
-  Logging.info(JSON.stringify(req.query, Object.getOwnPropertyNames(req.body)));
   try {
-    const getPostListRequest: GetPostListRequest = Mapper.map(GetPostListRequest, req.body);
+    let {key, types} = req.query;
 
-    const postList: PostModel[] = await PostClient.getPosts(getPostListRequest);
+    console.log(types, "types");
+
+    if (key && typeof key !== "string") {
+      return ApiHelper.getErrorResponseForInvalidRequestBody(res);
+    }
+
+    if (types) {
+      if (!types.length) {
+        types = [`${types}`];
+      }
+    }
+
+    const postList: PostModel[] = await PostClient.getPosts({key, types: types as string[]});
 
     const postOwnerIdList = postList.map(post => post.userId);
     const users = await UserClient.getUsersByListId(postOwnerIdList);
