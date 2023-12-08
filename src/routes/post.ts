@@ -11,7 +11,7 @@ import getUserPostsHandler from "../controllers/post/get-user-posts";
 
 const postRouter = express.Router();
 
-postRouter.post("", isAuth, createPostHandler);
+postRouter.post("", isAuth, imageUpload.array("image"), createPostHandler);
 postRouter.put("", isAuth, imageUpload.array("image"), editPostHandler);
 postRouter.get("/list", isAuth, getPostListHandler);
 postRouter.get("/user", isAuth, getUserPostsHandler);

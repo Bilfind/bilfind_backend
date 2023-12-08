@@ -37,13 +37,24 @@ const createPostHandler = async (req: Request, res: Response) => {
     const user: User = locals.user;
     const userId = user._id!.toString();
 
+    const files = req.files;
+    console.log(files);
+
+    const images: string[] = [];
+    if (files && typeof files.length === "number") {
+      for (let i = 0; i < (files.length as number); i++) {
+        const file = (files as any[])[i];
+        images.push(file.location);
+      }
+    }
+
     const createdPostId = await PostClient.createPost(
       createPostRequest.title,
       createPostRequest.content,
       createPostRequest.type,
       userId,
       createPostRequest.price,
-      []
+      images
     );
 
     if (!createdPostId) {
