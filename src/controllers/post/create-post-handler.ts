@@ -6,7 +6,7 @@ import Logging from "../../utils/logging";
 import { IsEnum, IsString } from "class-validator";
 import { User } from "../../models/user-model";
 import { PostClient } from "../../clients/post-client";
-import { PostType } from "../../models/post-model";
+import { PostType, mapToPostResponseDTO } from "../../models/post-model";
 import { UserClient } from "../../clients/user-client";
 
 class CreatePostRequest {
@@ -72,7 +72,8 @@ const createPostHandler = async (req: Request, res: Response) => {
       return ApiHelper.getErrorResponseForCrash(res, "Post could not be added to users own posts");
     }
 
-    return ApiHelper.getSuccessfulResponse(res, post);
+    const getPostDTO = mapToPostResponseDTO(post, user);
+    return ApiHelper.getSuccessfulResponse(res, { post: getPostDTO });
   } catch (error) {
     Logging.error(error);
 
