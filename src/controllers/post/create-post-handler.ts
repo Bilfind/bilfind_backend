@@ -23,7 +23,7 @@ class CreatePostRequest {
   content: string;
 
   @Expose()
-  price: number;
+  price: string;
 }
 
 // base endpoint structure
@@ -53,7 +53,7 @@ const createPostHandler = async (req: Request, res: Response) => {
       createPostRequest.content,
       createPostRequest.type,
       userId,
-      createPostRequest.price,
+      parseFloat(createPostRequest.price),
       images
     );
 
