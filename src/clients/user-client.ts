@@ -260,4 +260,27 @@ export class UserClient {
         return false;
       }
     }
+
+    static async updateProfilePhoto(userId: string, imageUrl: string) {
+      try {
+        const db = mongoose.connection.db;
+        const userCollection = db.collection("user");
+        
+        const filter = { _id: new mongoose.Types.ObjectId(userId)};
+
+        const update = {
+          $set: {
+            profilePhoto: imageUrl,
+          }
+        }
+        
+        const result: UpdateResult = await userCollection.updateOne(filter, update);
+        Logging.info("User profile photo successfully updated");
+
+        return result.modifiedCount > 0;
+      } catch (error) {
+        Logging.error(error);
+        return false;
+      }
+    }
 }
