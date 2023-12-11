@@ -7,6 +7,7 @@ import { IsString } from "class-validator";
 import { User } from "../../models/user-model";
 import { PostClient } from "../../clients/post-client";
 import { Multer } from "multer";
+import { mapToPostResponseDTO } from "../../models/post-model";
 
 export class EditPostRequest {
   @Expose()
@@ -73,7 +74,9 @@ const editPostHandler = async (req: Request, res: Response) => {
       return ApiHelper.getErrorResponseForCrash(res, "Post could not be edited");
     }
 
-    return ApiHelper.getSuccessfulResponse(res, { post: postUpdated });
+    const postResponseDto = mapToPostResponseDTO(postUpdated, user);
+
+    return ApiHelper.getSuccessfulResponse(res, { post: postResponseDto });
   } catch (error) {
     Logging.error(error);
 
