@@ -23,7 +23,7 @@ export class EditPostRequest {
   price?: number;
 
   @Expose()
-  images?: string[];
+  images?: any;
 }
 
 // base endpoint structure
@@ -40,23 +40,26 @@ const editPostHandler = async (req: Request, res: Response) => {
     const post = await PostClient.getPostById(editPostRequest.postId);
 
     if (!post) {
-        return ApiHelper.getErrorResponseForCrash(res, "Post could not be found");
+      return ApiHelper.getErrorResponseForCrash(res, "Post could not be found");
     }
 
     if (userId !== post.userId) {
       return ApiHelper.getErrorResponseForCrash(res, "Post does not belong to this user");
-  }
+    }
 
     const files = req.files;
     console.log(files);
 
-    const images: string[] = editPostRequest.images ?? [];
+    const images: any =
+      typeof editPostRequest.images === "string" ? [editPostRequest.images] : editPostRequest.images ?? [];
+    console.log(images);
     if (files && typeof files.length === "number") {
       for (let i = 0; i < (files.length as number); i++) {
         const file = (files as any[])[i];
         images.push(file.location);
       }
     }
+    console.log(images);
     editPostRequest.images = images;
     const updated = await PostClient.editPost(editPostRequest, userId);
 
