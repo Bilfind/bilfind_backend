@@ -34,9 +34,8 @@ const deleteUser = async (req: Request, res: Response) => {
 
     const deleteResult = await UserClient.deleteUserByEmail(user.email);
 
-    if (deleteResult) {
-      user.latestStatus = UserStatus.VERIFIED;
-      return ApiHelper.getSuccessfulResponse(res, { message: "User successfully deleted" });
+    if (!deleteResult) {
+      return ApiHelper.getErrorResponseForCrash(res, "User could not be deleted");
     }
 
     // delete user posts
@@ -53,7 +52,7 @@ const deleteUser = async (req: Request, res: Response) => {
     // delete user comments
     await PostClient.deleteComment(user._id!.toString());
 
-    return ApiHelper.getErrorResponseForCrash(res, "User could not be deleted");
+    return ApiHelper.getSuccessfulResponse(res, { message: "User successfully deleted" });
   } catch (error) {
     Logging.error(error);
 
