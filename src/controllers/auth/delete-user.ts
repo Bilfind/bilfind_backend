@@ -50,7 +50,7 @@ const deleteUser = async (req: Request, res: Response) => {
     // user deleted it deliberately or it is deleted as a result of parent deletion.
 
     // delete user comments
-    await PostClient.deleteComment(user._id!.toString());
+    await PostClient.deleteUserComments(user._id!.toString());
 
     return ApiHelper.getSuccessfulResponse(res, { message: "User successfully deleted" });
   } catch (error) {
