@@ -8,6 +8,7 @@ import { UserClient } from "../../clients/user-client";
 import { IsNumber, IsString, validate } from "class-validator";
 import { OtpClient } from "../../clients/otp-client";
 import { UserStatus, mapToUserResponseDTO } from "../../models/user-model";
+import { generateAuthenticationToken } from "../../utils/authentication-helper";
 
 class PutVerifyRegistirationOtpRequest {
   @Expose()
@@ -49,13 +50,19 @@ const putVerifyRegistirationOtp = async (req: Request, res: Response) => {
       ]);
     }
     const successfullyUpdated = await UserClient.updateStatus(user.email, UserStatus.VERIFIED);
-    
+
     if (successfullyUpdated) {
       user.latestStatus = UserStatus.VERIFIED;
       const userResponseDTO = mapToUserResponseDTO(user);
-      return ApiHelper.getSuccessfulResponse(res, { message: "User successfully verified", user: userResponseDTO });
-    }
 
+      const token = generateAuthenticationToken(user);
+
+      return ApiHelper.getSuccessfulResponse(res, {
+        message: "User successfully verified",
+        user: userResponseDTO,
+        token,
+      });
+    }
 
     return ApiHelper.getErrorResponseForCrash(res, "User status could not be updated");
   } catch (error) {
