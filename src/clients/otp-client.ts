@@ -12,7 +12,7 @@ export class OtpClient {
     return code;
   }
 
-  static async createRegisterOtp(email: string): Promise<Otp | null> {
+  static async createRegisterOtp(email: string, otpType: OtpType): Promise<Otp | null> {
     try {
       const db = mongoose.connection.db;
       const userCollection = db.collection("otp");
@@ -25,10 +25,10 @@ export class OtpClient {
         createdAt: currentDate,
         validUntil: threeMinutesLater,
         email,
-        type: OtpType.REGISTER,
+        type: otpType,
       };
 
-      const data = await userCollection.insertOne( otp );
+      const data = await userCollection.insertOne(otp);
 
       Logging.info("Otp code is generated, ", otp);
 
@@ -39,13 +39,13 @@ export class OtpClient {
     }
   }
 
-  static async verifyRegistirationOtp(email: string, otpCode: number): Promise<boolean> {
+  static async verifyRegistirationOtp(email: string, otpCode: number, otpType: OtpType): Promise<boolean> {
     try {
       const db = mongoose.connection.db;
       const otpCollection = db.collection("otp");
 
-      const data = await otpCollection.findOne({ email }, { sort: { createdAt: -1} })
-      const otp : Otp = Mapper.map(Otp, data);
+      const data = await otpCollection.findOne({ email, type: otpType }, { sort: { createdAt: -1 } });
+      const otp: Otp = Mapper.map(Otp, data);
 
       if (!otp) {
         return false;

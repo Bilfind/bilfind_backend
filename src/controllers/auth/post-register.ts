@@ -10,6 +10,7 @@ import { HashingHelper } from "../../utils/hashing-helper";
 import { IsString, validate } from "class-validator";
 import { MailHelper } from "../../utils/mail-helper";
 import { OtpClient } from "../../clients/otp-client";
+import { OtpType } from "../../models/otp-model";
 
 class PostRegisterRequest {
   @Expose()
@@ -41,20 +42,30 @@ const postRegister = async (req: Request, res: Response) => {
 
     const existingUser = await UserClient.getUserByEmail(getTestRequest.email);
     if (existingUser) {
-        return ApiHelper.getErrorResponse(res, 403, [{
-            errorCode: ApiErrorCode.EMAIL_ALREADY_EXISTS,
-            message: "Email already exists"
-        }])
+      return ApiHelper.getErrorResponse(res, 403, [
+        {
+          errorCode: ApiErrorCode.EMAIL_ALREADY_EXISTS,
+          message: "Email already exists",
+        },
+      ]);
     }
 
     const hashedPassword = HashingHelper.hashPassword(getTestRequest.password);
 
-    const userId = await UserClient.createUser(getTestRequest.email, hashedPassword, getTestRequest.name, getTestRequest.familyName, getTestRequest.departmant);
+    const userId = await UserClient.createUser(
+      getTestRequest.email,
+      hashedPassword,
+      getTestRequest.name,
+      getTestRequest.familyName,
+      getTestRequest.departmant
+    );
     if (!userId) {
-        return ApiHelper.getErrorResponse(res, 500, [{
-            errorCode: ApiErrorCode.SOMETHING_BAD_HAPPENED,
-            message: "User could not be created"
-        }])
+      return ApiHelper.getErrorResponse(res, 500, [
+        {
+          errorCode: ApiErrorCode.SOMETHING_BAD_HAPPENED,
+          message: "User could not be created",
+        },
+      ]);
     }
 
     const user = await UserClient.getUserById(userId.toString());
@@ -62,9 +73,9 @@ const postRegister = async (req: Request, res: Response) => {
     //TODO: you can map to return user instead of doing this
     user!.hashedPassword = "";
 
-    const otp = await OtpClient.createRegisterOtp(user!.email);
+    const otp = await OtpClient.createRegisterOtp(user!.email, OtpType.REGISTER);
     MailHelper.sendRegisterOtpMail(otp!);
-    ApiHelper.getSuccessfulResponse(res, { message: "User successfully registered", user});
+    ApiHelper.getSuccessfulResponse(res, { message: "User successfully registered", user });
   } catch (error) {
     Logging.error(error);
 
@@ -74,7 +85,5 @@ const postRegister = async (req: Request, res: Response) => {
     ApiHelper.getErrorResponseForCrash(res, JSON.stringify(Object.getOwnPropertyNames(req)));
   }
 };
-
-
 
 export default postRegister;

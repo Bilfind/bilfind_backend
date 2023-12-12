@@ -9,6 +9,7 @@ import { IsString } from "class-validator";
 import { Mapper } from "./mapper";
 
 const SECRET_KEY = process.env.SECRET_KEY;
+const SECRET_RESET_KEY = process.env.SECRET_RESET_KEY;
 
 export class RequestLocals {
   user: User | null | undefined;
@@ -36,6 +37,26 @@ export const generateAuthenticationToken = (user: User) => {
   return token;
 };
 
+export const generateResetPasswordToken = (user: User) => {
+  if (!SECRET_RESET_KEY) {
+    Logging.error("SECRET_RESET_KEY not found!");
+    return "";
+  }
+
+  const token = sign(
+    {
+      user_id: user._id,
+      email: user.email,
+    },
+    SECRET_RESET_KEY,
+    {
+      expiresIn: "1h", //TODO: expires in one hour it can be change
+    }
+  );
+
+  return token;
+};
+
 class AuthenticationTokenMetadata {
   @Expose()
   @IsString()
@@ -44,6 +65,16 @@ class AuthenticationTokenMetadata {
   @Expose()
   @IsString()
   hashCode: string;
+
+  @Expose()
+  @IsString()
+  user_id: string;
+}
+
+class ResetTokenMetadata {
+  @Expose()
+  @IsString()
+  email: string;
 
   @Expose()
   @IsString()
@@ -76,6 +107,40 @@ export const isAuth = async (req: Request, res: Response, next: NextFunction) =>
     if (tokenMetadata.hashCode !== user?.hashedPassword) {
       return ApiHelper.getErrorResponseForUnauthorized(res);
     }
+
+    // @ts-ignore
+    req.locals = locals;
+
+    next();
+  } catch (error) {
+    return ApiHelper.getErrorResponseForUnauthorized(res);
+  }
+};
+
+export const isResetPasswordAuth = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { resetToken } = req.body;
+
+    if (!SECRET_RESET_KEY) {
+      Logging.error("SECRET_KEY not found!");
+      return ApiHelper.getErrorResponseForUnauthorized(res);
+    }
+
+    if (!resetToken) {
+      return ApiHelper.getErrorResponseForUnauthorized(res);
+    }
+    console.log("aflknaslfn");
+
+    const decodedToken = verify(resetToken, SECRET_RESET_KEY);
+    const tokenMetadata: ResetTokenMetadata = Mapper.map(ResetTokenMetadata, decodedToken);
+
+    console.log("resrser");
+
+    const user = await UserClient.getUserById(tokenMetadata.user_id);
+    const locals: RequestLocals = {
+      user: user,
+      email: user?.email,
+    };
 
     // @ts-ignore
     req.locals = locals;

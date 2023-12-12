@@ -8,10 +8,10 @@ import { UserClient } from "../../clients/user-client";
 import { IsNumber, IsString, validate } from "class-validator";
 import { OtpClient } from "../../clients/otp-client";
 import { UserStatus, mapToUserResponseDTO } from "../../models/user-model";
-import { generateAuthenticationToken } from "../../utils/authentication-helper";
+import { generateAuthenticationToken, generateResetPasswordToken } from "../../utils/authentication-helper";
 import { OtpType } from "../../models/otp-model";
 
-class PutVerifyRegistirationOtpRequest {
+class PutVerifyResetOtpRequest {
   @Expose()
   @IsString()
   email: string;
@@ -22,13 +22,10 @@ class PutVerifyRegistirationOtpRequest {
 }
 
 // base endpoint structure
-const putVerifyRegistirationOtp = async (req: Request, res: Response) => {
+const putVerifyResetOtpHandler = async (req: Request, res: Response) => {
   Logging.info(JSON.stringify(req.query, Object.getOwnPropertyNames(req.query)));
   try {
-    const putVerifyRegistirationOtpRequest: PutVerifyRegistirationOtpRequest = Mapper.map(
-      PutVerifyRegistirationOtpRequest,
-      req.body
-    );
+    const putVerifyRegistirationOtpRequest: PutVerifyResetOtpRequest = Mapper.map(PutVerifyResetOtpRequest, req.body);
 
     const user = await UserClient.getUserByEmail(putVerifyRegistirationOtpRequest.email);
     if (!user) {
@@ -43,7 +40,7 @@ const putVerifyRegistirationOtp = async (req: Request, res: Response) => {
     const isValidated = await OtpClient.verifyRegistirationOtp(
       user!.email,
       putVerifyRegistirationOtpRequest.otp,
-      OtpType.REGISTER
+      OtpType.RESET
     );
 
     if (!isValidated) {
@@ -54,22 +51,17 @@ const putVerifyRegistirationOtp = async (req: Request, res: Response) => {
         },
       ]);
     }
-    const successfullyUpdated = await UserClient.updateStatus(user.email, UserStatus.VERIFIED);
 
-    if (successfullyUpdated) {
-      user.latestStatus = UserStatus.VERIFIED;
-      const userResponseDTO = mapToUserResponseDTO(user);
-
-      const token = generateAuthenticationToken(user);
+    if (isValidated) {
+      const resetToken = generateResetPasswordToken(user);
 
       return ApiHelper.getSuccessfulResponse(res, {
-        message: "User successfully verified",
-        user: userResponseDTO,
-        token,
+        message: "Reset otp successfully validated",
+        resetToken,
       });
     }
 
-    return ApiHelper.getErrorResponseForCrash(res, "User status could not be updated");
+    return ApiHelper.getErrorResponseForCrash(res, "Reset password otp code could not be verified.");
   } catch (error) {
     Logging.error(error);
 
@@ -80,4 +72,4 @@ const putVerifyRegistirationOtp = async (req: Request, res: Response) => {
   }
 };
 
-export default putVerifyRegistirationOtp;
+export default putVerifyResetOtpHandler;
