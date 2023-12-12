@@ -8,6 +8,7 @@ import { UserClient } from "../../clients/user-client";
 import { IsNumber, IsString, validate } from "class-validator";
 import { OtpClient } from "../../clients/otp-client";
 import { UserStatus } from "../../models/user-model";
+import { PostClient } from "../../clients/post-client";
 
 class DeleteUserRequest {
   @Expose()
@@ -19,10 +20,7 @@ class DeleteUserRequest {
 const deleteUser = async (req: Request, res: Response) => {
   Logging.info(JSON.stringify(req.query, Object.getOwnPropertyNames(req.query)));
   try {
-    const deleteUserRequest: DeleteUserRequest = Mapper.map(
-      DeleteUserRequest,
-        req.query
-    );
+    const deleteUserRequest: DeleteUserRequest = Mapper.map(DeleteUserRequest, req.query);
 
     const user = await UserClient.getUserByEmail(deleteUserRequest.email);
     if (!user) {
@@ -35,11 +33,25 @@ const deleteUser = async (req: Request, res: Response) => {
     }
 
     const deleteResult = await UserClient.deleteUserByEmail(user.email);
-    
+
     if (deleteResult) {
       user.latestStatus = UserStatus.VERIFIED;
       return ApiHelper.getSuccessfulResponse(res, { message: "User successfully deleted" });
     }
+
+    // delete user posts
+    await PostClient.deleteUserPosts(user._id!.toString());
+
+    // delete user conversations
+
+    // delete user reports
+
+    // delete comments under deleted comments
+    // ? if we do delete them this way, it will be hard to determine whether
+    // user deleted it deliberately or it is deleted as a result of parent deletion.
+
+    // delete user comments
+    await PostClient.deleteComment(user._id!.toString());
 
     return ApiHelper.getErrorResponseForCrash(res, "User could not be deleted");
   } catch (error) {

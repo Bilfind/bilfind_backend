@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { Mapper } from "../utils/mapper";
 import Logging from "../utils/logging";
-import { ObjectId } from "mongodb";
+import { ObjectId, UpdateResult } from "mongodb";
 import { PostModel, PostType } from "../models/post-model";
 import { EditPostRequest } from "../controllers/post/edit-post-handler";
 import { SearchFilterModel } from "../controllers/post/get-post-list-handler";
@@ -15,7 +15,7 @@ export class PostClient {
       const db = mongoose.connection.db;
       const commentCollection = db.collection("comment");
 
-      const data = await commentCollection.findOne({ _id: new mongoose.Types.ObjectId(commentId), isDeleted: false});
+      const data = await commentCollection.findOne({ _id: new mongoose.Types.ObjectId(commentId), isDeleted: false });
 
       const comment: CommentModel = Mapper.map(CommentModel, data);
       if (!comment) {
@@ -37,7 +37,7 @@ export class PostClient {
       const db = mongoose.connection.db;
       const commentCollection = db.collection("comment");
 
-      const dataCursor = commentCollection.find({ postId, isDeleted: false});
+      const dataCursor = commentCollection.find({ postId, isDeleted: false });
       const postComments = (await dataCursor.toArray()).map((dataItem) => Mapper.map(CommentModel, dataItem));
 
       return postComments;
@@ -47,10 +47,7 @@ export class PostClient {
     }
   }
 
-  static async createComment(
-    postCommentRequest: PostCommentRequest,
-    user: User
-  ): Promise<ObjectId | null> {
+  static async createComment(postCommentRequest: PostCommentRequest, user: User): Promise<ObjectId | null> {
     try {
       const db = mongoose.connection.db;
       const commentCollection = db.collection("comment");
@@ -79,7 +76,7 @@ export class PostClient {
       const db = mongoose.connection.db;
       const commentCollection = db.collection("comment");
 
-      const filter = { $or: [{_id: new mongoose.Types.ObjectId(commentId)}, {parentId: commentId }] };
+      const filter = { $or: [{ _id: new mongoose.Types.ObjectId(commentId) }, { parentId: commentId }] };
       const update = {
         $set: {
           isDeleted: true,
@@ -138,17 +135,17 @@ export class PostClient {
     if (searchFilterModel.types && searchFilterModel.types.length > 0) {
       filter.type = { $in: searchFilterModel.types };
     }
-  
+
     if (searchFilterModel.minPrice !== undefined) {
       filter.price = { $gte: searchFilterModel.minPrice };
     }
-  
+
     if (searchFilterModel.maxPrice !== undefined) {
       filter.price = { ...filter.price, $lte: searchFilterModel.maxPrice };
-    }  
+    }
 
     if (searchFilterModel.types) {
-      filter.type = {$in: searchFilterModel.types!};
+      filter.type = { $in: searchFilterModel.types! };
     }
 
     if (searchFilterModel.key) {
@@ -156,25 +153,23 @@ export class PostClient {
       const or: any = {
         $or: [
           {
-            content: { $regex: regex }
+            content: { $regex: regex },
           },
           {
-            title: { $regex: regex }
-          }
-        ]
-      }
+            title: { $regex: regex },
+          },
+        ],
+      };
       if (searchFilterModel.userIdList) {
         or.$or.push({
-          userId : {$in: searchFilterModel.userIdList!}
+          userId: { $in: searchFilterModel.userIdList! },
         });
       }
       filter = {
         ...filter,
         ...or,
-      }
+      };
     }
-
-    
 
     console.log("searchFilterModel");
     console.log(searchFilterModel);
@@ -191,7 +186,7 @@ export class PostClient {
     const postCollection = db.collection("post");
 
     const objectIdList = postIdList.map((postId) => new mongoose.Types.ObjectId(postId));
-    const filter: any = { isDeleted: false, _id: {$in: objectIdList} };
+    const filter: any = { isDeleted: false, _id: { $in: objectIdList } };
 
     const dataCursor = postCollection.find(filter, { sort: { createdAt: -1 } });
     const posts = (await dataCursor.toArray()).map((dataItem) => Mapper.map(PostModel, dataItem));
@@ -255,6 +250,52 @@ export class PostClient {
     } catch (error) {
       Logging.error(error);
       return null;
+    }
+  }
+
+  static async deleteUserPosts(userId: string): Promise<boolean> {
+    try {
+      const db = mongoose.connection.db;
+      const postCollection = db.collection("post");
+
+      const filter = { userId };
+
+      const update = {
+        $set: {
+          isDeleted: true,
+        },
+      };
+
+      const result: UpdateResult = await postCollection.updateOne(filter, update);
+      Logging.info("User posts successfully deleted");
+
+      return result.modifiedCount > 0;
+    } catch (error) {
+      Logging.error(error);
+      return false;
+    }
+  }
+
+  static async deleteUserComments(userId: string): Promise<boolean> {
+    try {
+      const db = mongoose.connection.db;
+      const commentCollection = db.collection("comment");
+
+      const filter = { userId };
+
+      const update = {
+        $set: {
+          isDeleted: true,
+        },
+      };
+
+      const result: UpdateResult = await commentCollection.updateOne(filter, update);
+      Logging.info("User comments successfully deleted");
+
+      return result.modifiedCount > 0;
+    } catch (error) {
+      Logging.error(error);
+      return false;
     }
   }
 }
