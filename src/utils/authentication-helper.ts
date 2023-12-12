@@ -11,51 +11,56 @@ import { Mapper } from "./mapper";
 const SECRET_KEY = process.env.SECRET_KEY;
 
 export class RequestLocals {
-    user: User | null | undefined
-    email?: string
+  user: User | null | undefined;
+  email?: string;
 }
 
 export const generateAuthenticationToken = (user: User) => {
-    if (!SECRET_KEY) {
-        Logging.error("SECRET_KEY not found!")
-        return "";
+  if (!SECRET_KEY) {
+    Logging.error("SECRET_KEY not found!");
+    return "";
+  }
+
+  const token = sign(
+    {
+      user_id: user._id,
+      email: user.email,
+      hashCode: user.hashedPassword,
+    },
+    SECRET_KEY,
+    {
+      expiresIn: "1y", //TODO: expires in one day it can be change
     }
+  );
 
-    const token = sign(
-        {
-          user_id: user._id,
-          email: user.email,
-        },
-        SECRET_KEY,
-        {
-          expiresIn: "1y", //TODO: expires in one day it can be change
-        }
-      );
-
-      return token;
-}
+  return token;
+};
 
 class AuthenticationTokenMetadata {
-    @Expose()
-    @IsString()
-    email: string;
-  
-    @Expose()
-    @IsString()
-    user_id: string;
-  } 
+  @Expose()
+  @IsString()
+  email: string;
+
+  @Expose()
+  @IsString()
+  hashCode: string;
+
+  @Expose()
+  @IsString()
+  user_id: string;
+}
 
 export const isAuth = async (req: Request, res: Response, next: NextFunction) => {
-   try {
+  try {
     const token = req.headers["authorization"];
 
     if (!SECRET_KEY) {
-        Logging.error("SECRET_KEY not found!")
-        return ApiHelper.getErrorResponseForUnauthorized(res);
+      Logging.error("SECRET_KEY not found!");
+      return ApiHelper.getErrorResponseForUnauthorized(res);
     }
 
     if (!token) {
-        return ApiHelper.getErrorResponseForUnauthorized(res);
+      return ApiHelper.getErrorResponseForUnauthorized(res);
     }
 
     const bearerToken = token.split(" ")[1];
@@ -64,16 +69,19 @@ export const isAuth = async (req: Request, res: Response, next: NextFunction) =>
 
     const user = await UserClient.getUserById(tokenMetadata.user_id);
     const locals: RequestLocals = {
-        user: user,
-        email: user?.email,
+      user: user,
+      email: user?.email,
+    };
+
+    if (tokenMetadata.hashCode !== user?.hashedPassword) {
+      return ApiHelper.getErrorResponseForUnauthorized(res);
     }
 
     // @ts-ignore
     req.locals = locals;
 
     next();
-   } catch (error) {
+  } catch (error) {
     return ApiHelper.getErrorResponseForUnauthorized(res);
-   }
+  }
 };
-
