@@ -1,72 +1,72 @@
 import { Expose, Transform } from "class-transformer";
 import { ObjectId } from "mongodb";
 import { User } from "./user-model";
-import { Departmant } from "../utils/enums";
 import { Mapper } from "../utils/mapper";
+import { Departments } from "../utils/enums";
 
 export class CommentModel {
-    @Transform((value) => value.obj._id.toString())
-    @Expose()
-    _id?: ObjectId;
+  @Transform((value) => value.obj._id.toString())
+  @Expose()
+  _id?: ObjectId;
 
-    @Expose()
-    postId: string;
+  @Expose()
+  postId: string;
 
-    @Expose()
-    userId: string;
+  @Expose()
+  userId: string;
 
-    @Expose()
-    parentId?: string;
+  @Expose()
+  parentId?: string;
 
-    @Expose()
-    content: string;
- 
-    @Expose()
-    createdAt: Date;
+  @Expose()
+  content: string;
 
-    @Expose()
-    isDeleted: boolean;
+  @Expose()
+  createdAt: Date;
+
+  @Expose()
+  isDeleted: boolean;
 }
 
 export class CommentResponseDTO {
-    @Expose()
-    id: String;
+  @Expose()
+  id: String;
 
-    @Expose()
-    postId: string;
+  @Expose()
+  postId: string;
 
-    @Expose()
-    userId: string;
+  @Expose()
+  userId: string;
 
-    @Expose()
-    parentId?: string;
+  @Expose()
+  parentId?: string;
 
-    @Expose()
-    content: string;
+  @Expose()
+  content: string;
 
-    @Expose()
-    createdAt: Date;
+  @Expose()
+  createdAt: Date;
 
-    @Expose()
-    ownerPhoto?: string;
+  @Expose()
+  ownerPhoto?: string;
 
-    @Expose()
-    ownerName: string;
+  @Expose()
+  ownerName: string;
 
-    @Expose()
-    ownerEmail: string;
+  @Expose()
+  ownerEmail: string;
 
-    @Expose()
-    ownerDepartment: Departmant;
+  @Expose()
+  ownerDepartment: Departments;
 }
 
 export const mapToCommentResponseDTO = (commentModel: CommentModel, user: User): CommentResponseDTO => {
-    return Mapper.map(CommentResponseDTO, {
-        ...commentModel,
-        id: commentModel._id!.toString(),
-        ownerPhoto: user.profilePhoto,
-        ownerName: user.name + " " + user.familyName,
-        ownerDepartment: user.departmant,
-        ownerEmail: user.email,
-    });
-}
+  return Mapper.map(CommentResponseDTO, {
+    ...commentModel,
+    id: commentModel._id!.toString(),
+    ownerPhoto: user.profilePhoto,
+    ownerName: user.name + " " + user.familyName,
+    ownerDepartment: user.departmant,
+    ownerEmail: user.email,
+  });
+};

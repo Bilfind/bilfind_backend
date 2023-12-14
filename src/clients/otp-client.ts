@@ -1,9 +1,6 @@
 import mongoose from "mongoose";
-import { User } from "../models/user-model";
 import { Mapper } from "../utils/mapper";
 import Logging from "../utils/logging";
-import { Departmant } from "../utils/enums";
-import { ObjectId } from "mongodb";
 import { Otp, OtpType } from "../models/otp-model";
 
 export class OtpClient {

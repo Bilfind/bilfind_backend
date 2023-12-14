@@ -1,85 +1,85 @@
 import { Expose, Transform } from "class-transformer";
-import { Departmant } from "../utils/enums";
 import { ObjectId } from "mongodb";
 import { Mapper } from "../utils/mapper";
+import { Departments } from "../utils/enums";
 
 export class User {
-    @Transform((value) => value.obj._id.toString())
-    @Expose()
-    _id?: ObjectId;
+  @Transform((value) => value.obj._id.toString())
+  @Expose()
+  _id?: ObjectId;
 
-    @Expose()
-    email: string;
+  @Expose()
+  email: string;
 
-    @Expose()
-    hashedPassword: string;
+  @Expose()
+  hashedPassword: string;
 
-    @Expose()
-    name: string;
+  @Expose()
+  name: string;
 
-    @Expose()
-    createdAt: Date;
+  @Expose()
+  createdAt: Date;
 
-    @Expose()
-    profilePhoto?: string;
+  @Expose()
+  profilePhoto?: string;
 
-    @Expose()
-    familyName: string;
+  @Expose()
+  familyName: string;
 
-    @Expose()
-    departmant: Departmant;
+  @Expose()
+  departmant: Departments;
 
-    @Expose()
-    latestStatus: UserStatus;
+  @Expose()
+  latestStatus: UserStatus;
 
-    @Expose()
-    favoritePostIds: string[];
+  @Expose()
+  favoritePostIds: string[];
 
-    @Expose()
-    ownPostIds: string[];
+  @Expose()
+  ownPostIds: string[];
 }
 
 export class UserResponseDTO {
-    @Expose()
-    id: String;
+  @Expose()
+  id: String;
 
-    @Expose()
-    email: string;
+  @Expose()
+  email: string;
 
-    @Expose()
-    name: string;
+  @Expose()
+  name: string;
 
-    @Expose()
-    profilePhoto?: string;
+  @Expose()
+  profilePhoto?: string;
 
-    @Expose()
-    familyName: string;
+  @Expose()
+  familyName: string;
 
-    @Expose()
-    createdAt: Date;
+  @Expose()
+  createdAt: Date;
 
-    @Expose()
-    departmant: Departmant;
+  @Expose()
+  departmant: Departments;
 
-    @Expose()
-    latestStatus: UserStatus;
+  @Expose()
+  latestStatus: UserStatus;
 
-    @Expose()
-    favoritePostIds: string[];
+  @Expose()
+  favoritePostIds: string[];
 
-    @Expose()
-    ownPostIds: string[];
+  @Expose()
+  ownPostIds: string[];
 }
 
 export const mapToUserResponseDTO = (user: User): UserResponseDTO => {
-    return Mapper.map(UserResponseDTO, {
-        ...user,
-        id: user._id!.toString(),
-    });
-}
+  return Mapper.map(UserResponseDTO, {
+    ...user,
+    id: user._id!.toString(),
+  });
+};
 
 export enum UserStatus {
-    WAITING = "WAITING",
-    VERIFIED = "VERIFIED",
-    BANNED = "BANNED"
+  WAITING = "WAITING",
+  VERIFIED = "VERIFIED",
+  BANNED = "BANNED",
 }

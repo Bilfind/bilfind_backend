@@ -4,13 +4,13 @@ import { Mapper } from "../../utils/mapper";
 import { ApiHelper } from "../../utils/api-helper";
 import Logging from "../../utils/logging";
 import { ApiErrorCode } from "../../utils/error-codes";
-import { Departmant } from "../../utils/enums";
 import { UserClient } from "../../clients/user-client";
 import { HashingHelper } from "../../utils/hashing-helper";
 import { IsString, validate } from "class-validator";
 import { MailHelper } from "../../utils/mail-helper";
 import { OtpClient } from "../../clients/otp-client";
 import { OtpType } from "../../models/otp-model";
+import { Departments } from "../../utils/enums";
 
 class PostRegisterRequest {
   @Expose()
@@ -31,7 +31,7 @@ class PostRegisterRequest {
 
   @Expose()
   @IsString()
-  department: Departmant;
+  department: Departments;
 }
 
 // base endpoint structure
@@ -57,7 +57,7 @@ const postRegister = async (req: Request, res: Response) => {
       hashedPassword,
       getTestRequest.name,
       getTestRequest.familyName,
-      getTestRequest.departmant
+      getTestRequest.department
     );
     if (!userId) {
       return ApiHelper.getErrorResponse(res, 500, [

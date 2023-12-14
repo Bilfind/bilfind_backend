@@ -38,17 +38,17 @@ const postCommentHandler = async (req: Request, res: Response) => {
     }
 
     if (postCommentRequest.parentId) {
-        const comment = await PostClient.getCommentById(postCommentRequest.parentId);
+      const comment = await PostClient.getCommentById(postCommentRequest.parentId);
 
-        if (!comment) {
-          return ApiHelper.getErrorResponseForCrash(res, "Parent comment not found with id " + postCommentRequest.parentId);
-        }
+      if (!comment) {
+        return ApiHelper.getErrorResponseForCrash(
+          res,
+          "Parent comment not found with id " + postCommentRequest.parentId
+        );
+      }
     }
 
-    const createdCommentId = await PostClient.createComment(
-      postCommentRequest,
-      user
-    );
+    const createdCommentId = await PostClient.createComment(postCommentRequest, user);
 
     if (!createdCommentId) {
       return ApiHelper.getErrorResponseForCrash(res, "Comment could not be created");

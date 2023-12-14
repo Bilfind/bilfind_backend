@@ -1,9 +1,9 @@
 import { Expose, Transform } from "class-transformer";
 import { IsEnum } from "class-validator";
 import { ObjectId } from "mongodb";
-import { Departmant } from "../utils/enums";
 import { User } from "./user-model";
 import { Mapper } from "../utils/mapper";
+import { Departments } from "../utils/enums";
 
 export enum PostType {
   SALE = "SALE",
@@ -81,7 +81,7 @@ export class PostResponseDTO {
   ownerEmail: string;
 
   @Expose()
-  ownerDepartment: Departmant;
+  ownerDepartment: Departments;
 }
 
 export const mapToPostResponseDTO = (postModel: PostModel, user: User): PostResponseDTO => {

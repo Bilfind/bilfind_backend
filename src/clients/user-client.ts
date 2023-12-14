@@ -2,8 +2,8 @@ import mongoose from "mongoose";
 import { User, UserStatus } from "../models/user-model";
 import { Mapper } from "../utils/mapper";
 import Logging from "../utils/logging";
-import { Departmant } from "../utils/enums";
 import { ObjectId, UpdateResult } from "mongodb";
+import { Departments } from "../utils/enums";
 
 export class UserClient {
   static async deleteUserByEmail(email: string): Promise<boolean> {
@@ -145,7 +145,7 @@ export class UserClient {
     hashedPassword: string,
     name: string,
     familyName: string,
-    departmant: Departmant
+    departmant: Departments
   ): Promise<ObjectId | null> {
     try {
       const db = mongoose.connection.db;
