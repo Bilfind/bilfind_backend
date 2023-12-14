@@ -15,7 +15,7 @@ export class SearchFilterModel {
 
   @Expose()
   public userIdList?: ObjectId[];
-  
+
   @Expose()
   public types?: string[];
 
@@ -41,15 +41,16 @@ const getPostListHandler = async (req: Request, res: Response) => {
       }
     }
 
-    const postList: PostModel[] = await PostClient.getPosts(searchFilterModel);
+    let postList: PostModel[] = await PostClient.getPosts(searchFilterModel);
 
-    const postOwnerIdList = postList.map(post => post.userId);
+    const postOwnerIdList = postList.map((post) => post.userId);
     const users = await UserClient.getUsersByListId(postOwnerIdList);
     const userMap: Record<string, User> = {};
-    users.forEach((user) => userMap[user._id!.toString()] = user);
-    const getPostDTOList = postList.map(post => mapToPostResponseDTO(post, userMap[post.userId])); 
+    users.forEach((user) => (userMap[user._id!.toString()] = user));
+    postList = postList.filter((post) => userMap[post.userId]);
+    const getPostDTOList = postList.map((post) => mapToPostResponseDTO(post, userMap[post.userId]));
 
-    return ApiHelper.getSuccessfulResponse(res, {posts: getPostDTOList});
+    return ApiHelper.getSuccessfulResponse(res, { posts: getPostDTOList });
   } catch (error) {
     Logging.error(error);
 

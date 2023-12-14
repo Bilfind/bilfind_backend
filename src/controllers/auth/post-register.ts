@@ -31,7 +31,7 @@ class PostRegisterRequest {
 
   @Expose()
   @IsString()
-  departmant: Departmant;
+  department: Departmant;
 }
 
 // base endpoint structure
