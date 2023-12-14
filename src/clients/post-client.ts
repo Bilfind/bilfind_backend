@@ -266,7 +266,7 @@ export class PostClient {
         },
       };
 
-      const result: UpdateResult = await postCollection.updateOne(filter, update);
+      const result: UpdateResult = await postCollection.updateMany(filter, update);
       Logging.info("User posts successfully deleted");
 
       return result.modifiedCount > 0;

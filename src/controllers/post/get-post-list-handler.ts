@@ -34,7 +34,6 @@ const getPostListHandler = async (req: Request, res: Response) => {
       const userKey = extractUsername(searchFilterModel.key);
       console.log(userKey);
       if (userKey) {
-        console.log("anan");
         const users = await UserClient.getUsersByRegex(userKey);
         console.log(users);
         searchFilterModel.userIdList = users.map((user) => user._id!);
