@@ -289,7 +289,7 @@ export class PostClient {
         },
       };
 
-      const result: UpdateResult = await commentCollection.updateOne(filter, update);
+      const result: UpdateResult = await commentCollection.updateMany(filter, update);
       Logging.info("User comments successfully deleted");
 
       return result.modifiedCount > 0;
