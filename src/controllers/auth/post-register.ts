@@ -6,7 +6,7 @@ import Logging from "../../utils/logging";
 import { ApiErrorCode } from "../../utils/error-codes";
 import { UserClient } from "../../clients/user-client";
 import { HashingHelper } from "../../utils/hashing-helper";
-import { IsString, validate } from "class-validator";
+import { IsEnum, IsString } from "class-validator";
 import { MailHelper } from "../../utils/mail-helper";
 import { OtpClient } from "../../clients/otp-client";
 import { OtpType } from "../../models/otp-model";
@@ -30,7 +30,7 @@ class PostRegisterRequest {
   familyName: string;
 
   @Expose()
-  @IsString()
+  @IsEnum(Departments)
   department: Departments;
 }
 
@@ -50,7 +50,9 @@ const postRegister = async (req: Request, res: Response) => {
       ]);
     }
 
+    console.log(getTestRequest.password);
     const hashedPassword = HashingHelper.hashPassword(getTestRequest.password);
+    console.log(hashedPassword);
 
     const userId = await UserClient.createUser(
       getTestRequest.email,

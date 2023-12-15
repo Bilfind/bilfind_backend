@@ -17,15 +17,15 @@ const getUserPostsHandler = async (req: Request, res: Response) => {
     const favoritePosts: PostModel[] = await PostClient.getPostsByIdList(user.favoritePostIds);
     const userPosts: PostModel[] = await PostClient.getPostsByUserId(user._id!.toString());
 
-    const postOwnerIdList = [...favoritePosts, ...userPosts].map(post => post.userId);
+    const postOwnerIdList = [...favoritePosts, ...userPosts].map((post) => post.userId);
     const users = await UserClient.getUsersByListId(postOwnerIdList);
     const userMap: Record<string, User> = {};
-    users.forEach((user) => userMap[user._id!.toString()] = user);
+    users.forEach((user) => (userMap[user._id!.toString()] = user));
 
-    const favoritePostDTOList = favoritePosts.map(post => mapToPostResponseDTO(post, userMap[post.userId])); 
-    const userPostDTOList = userPosts.map(post => mapToPostResponseDTO(post, userMap[post.userId])); 
+    const favoritePostDTOList = favoritePosts.map((post) => mapToPostResponseDTO(post, userMap[post.userId]));
+    const userPostDTOList = userPosts.map((post) => mapToPostResponseDTO(post, userMap[post.userId]));
 
-    return ApiHelper.getSuccessfulResponse(res, {userPosts: userPostDTOList, favoritePosts: favoritePostDTOList});
+    return ApiHelper.getSuccessfulResponse(res, { userPosts: userPostDTOList, favoritePosts: favoritePostDTOList });
   } catch (error) {
     Logging.error(error);
 
