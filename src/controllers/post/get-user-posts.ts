@@ -29,7 +29,9 @@ const getUserPostsHandler = async (req: Request, res: Response) => {
     if (!retrievedUser) {
       favoritePosts = await PostClient.getPostsByIdList(user.favoritePostIds);
     }
-    const userPosts: PostModel[] = await PostClient.getPostsByUserId(user._id!.toString());
+    const userPosts: PostModel[] = await PostClient.getPostsByUserId(
+      retrievedUser?._id?.toString() ?? user._id!.toString()
+    );
 
     const postOwnerIdList = [...favoritePosts, ...userPosts].map((post) => post.userId);
     const users = await UserClient.getUsersByListId(postOwnerIdList);
