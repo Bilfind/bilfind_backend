@@ -14,7 +14,21 @@ const getUserPostsHandler = async (req: Request, res: Response) => {
     const locals = req.locals;
     const user: User = locals.user;
 
-    const favoritePosts: PostModel[] = await PostClient.getPostsByIdList(user.favoritePostIds);
+    const { userId } = req.query;
+
+    let retrievedUser: User | null = null;
+    if (typeof userId == "string") {
+      retrievedUser = await UserClient.getUserById(userId);
+    }
+
+    if (!retrievedUser) {
+      return ApiHelper.getErrorResponseForCrash(res, "User could not be found");
+    }
+
+    let favoritePosts: PostModel[] = [];
+    if (!retrievedUser) {
+      favoritePosts = await PostClient.getPostsByIdList(user.favoritePostIds);
+    }
     const userPosts: PostModel[] = await PostClient.getPostsByUserId(user._id!.toString());
 
     const postOwnerIdList = [...favoritePosts, ...userPosts].map((post) => post.userId);
