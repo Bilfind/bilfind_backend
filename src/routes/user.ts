@@ -10,5 +10,6 @@ const userRouter = express.Router();
 userRouter.put("/fav", isAuth, putUserFavHandler);
 userRouter.put("/photo", isAuth, imageUpload.single("image"), putUserProfilePhotoHandler);
 userRouter.get("/reports", isAuth, getUserReportsHandler);
+userRouter.get("", isAuth, getUserReportsHandler);
 
 export default userRouter;
