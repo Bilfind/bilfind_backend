@@ -9,16 +9,20 @@ import getPostDetailHandler from "../controllers/post/get-post-detail-handler";
 import deleteCommentHandler from "../controllers/post/delete-comment-handler";
 import getUserPostsHandler from "../controllers/post/get-user-posts";
 import postReportPostHandler from "../controllers/post/post-report-post-handler";
+import deletePostHandler from "../controllers/post/delete-post-handler";
 
 const postRouter = express.Router();
 
 postRouter.post("", isAuth, imageUpload.array("image"), createPostHandler);
 postRouter.put("", isAuth, imageUpload.array("image"), editPostHandler);
+postRouter.delete("", isAuth, deletePostHandler)
+postRouter.get("/:postId/", isAuth, getPostDetailHandler);
+
 postRouter.get("/list", isAuth, getPostListHandler);
 postRouter.get("/user", isAuth, getUserPostsHandler);
-postRouter.get("/:postId/", isAuth, getPostDetailHandler);
 postRouter.post("/comment", isAuth, postCommentHandler);
 postRouter.delete("/comment", isAuth, deleteCommentHandler);
 postRouter.post("/:postId/report", isAuth, postReportPostHandler);
 
 export default postRouter;
+
