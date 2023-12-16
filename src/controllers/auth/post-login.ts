@@ -8,7 +8,7 @@ import { UserClient } from "../../clients/user-client";
 import { HashingHelper } from "../../utils/hashing-helper";
 import { IsString, validate } from "class-validator";
 import { generateAuthenticationToken } from "../../utils/authentication-helper";
-import { mapToUserResponseDTO } from "../../models/user-model";
+import { UserStatus, mapToUserResponseDTO } from "../../models/user-model";
 
 class PostLoginRequest {
   @Expose()
@@ -36,6 +36,25 @@ const postLogin = async (req: Request, res: Response) => {
       ]);
     }
 
+    if(user.latestStatus === UserStatus.WAITING){
+      UserClient.deleteUserByEmail(postLoginRequest.email)
+      return ApiHelper.getErrorResponse(res, 403, [
+        {
+          errorCode: ApiErrorCode.UNAUTHORIZED,
+          message: "Incomplete registration",
+        },
+      ]);
+    }
+
+    if(user.latestStatus === UserStatus.BANNED){
+      return ApiHelper.getErrorResponse(res, 403, [
+        {
+          errorCode: ApiErrorCode.UNAUTHORIZED,
+          message: "User has been Banned.",
+        },
+      ]);
+    }
+
     const isPasswordValid = HashingHelper.comparePassword(postLoginRequest.password, user.hashedPassword);
 
     if (!isPasswordValid) {
@@ -46,7 +65,6 @@ const postLogin = async (req: Request, res: Response) => {
         },
       ]);
     }
-
     const token = generateAuthenticationToken(user);
 
     if (!token) {

@@ -11,6 +11,7 @@ import { MailHelper } from "../../utils/mail-helper";
 import { OtpClient } from "../../clients/otp-client";
 import { OtpType } from "../../models/otp-model";
 import { Departments } from "../../utils/enums";
+import { UserStatus } from "../../models/user-model";
 
 class PostRegisterRequest {
   @Expose()
@@ -41,7 +42,10 @@ const postRegister = async (req: Request, res: Response) => {
     const getTestRequest: PostRegisterRequest = Mapper.map(PostRegisterRequest, req.body);
 
     const existingUser = await UserClient.getUserByEmail(getTestRequest.email);
-    if (existingUser) {
+
+    if (existingUser?.latestStatus === UserStatus.WAITING) {
+      UserClient.deleteUserByEmail(existingUser.email);
+    } else if (existingUser) {
       return ApiHelper.getErrorResponse(res, 403, [
         {
           errorCode: ApiErrorCode.EMAIL_ALREADY_EXISTS,

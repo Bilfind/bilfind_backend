@@ -9,6 +9,7 @@ import { IsNumber, IsString, validate } from "class-validator";
 import { OtpClient } from "../../clients/otp-client";
 import { UserStatus } from "../../models/user-model";
 import { PostClient } from "../../clients/post-client";
+import { ReportClient } from "../../clients/report-client";
 
 class DeleteUserRequest {
   @Expose()
@@ -44,6 +45,7 @@ const deleteUser = async (req: Request, res: Response) => {
     // delete user conversations
 
     // delete user reports
+    await ReportClient.deleteUsersReports(user._id!.toString());
 
     // delete comments under deleted comments
     // ? if we do delete them this way, it will be hard to determine whether

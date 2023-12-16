@@ -42,4 +42,25 @@ export class MailHelper {
     const subject = "Your Bilfind Reset Password Code";
     this.sendMail(otp.email, content, subject);
   }
+
+  public static sendBannedMail(to: string) {
+    const content = `Hello from Bilfind!\n\nYou have been banned from BilFind indefinitely. \n\nIf you think there is a problem, please contact us.\n\nThank you for using Bilfind!`;
+
+    const subject = "You are Banned from Bilfind";
+    this.sendMail(to, content, subject);
+  }
+
+  public static sendReportStatusUpdateMail(to: string, reportedName: string, reportStatus: string) {
+    const content = `Hello from Bilfind!\n\nWe reviewed ${reportedName}'s post you reported. \n\n Current status of your report: ${reportStatus}.\n\nThank you for using Bilfind!`;
+
+    const subject = "We Reviewed Your Report";
+    this.sendMail(to, content, subject);
+  }
+
+  public static sendReportStatusUpdateMailtoPostOwner(to: string, title: string) {
+    const content = `Hello from Bilfind!\n\nWe reviewed your post with id ${title} and decided to remove it because it does not comply with our community rules.\n\nThank you for using Bilfind!`;
+
+    const subject = "We removed your post";
+    this.sendMail(to, content, subject);
+  }
 }

@@ -4,6 +4,7 @@ import { Mapper } from "../utils/mapper";
 import Logging from "../utils/logging";
 import { ObjectId, UpdateResult } from "mongodb";
 import { Departments } from "../utils/enums";
+import { MailHelper } from "../utils/mail-helper";
 
 export class UserClient {
   static async deleteUserByEmail(email: string): Promise<boolean> {
@@ -112,8 +113,12 @@ export class UserClient {
       const db = mongoose.connection.db;
       const userCollection = db.collection("user");
 
-      const data = await userCollection.findOne({ email });
-      //const data = await userCollection.findOne({ email, status: {$ne: "DELETED"} });
+      //const data = await userCollection.findOne({ email });
+      const data = await userCollection.findOne({
+        email,
+        latestStatus: { $in: [UserStatus.VERIFIED, UserStatus.WAITING, UserStatus.BANNED] },
+      });
+      console.log(data);
 
       const user: User = Mapper.map(User, data);
       if (!user) {
@@ -143,6 +148,10 @@ export class UserClient {
 
       const result: UpdateResult = await userCollection.updateOne(filter, update);
       Logging.info("User successfully updated: ", status);
+
+      if (status === UserStatus.BANNED) {
+        MailHelper.sendBannedMail(email);
+      }
 
       return result.modifiedCount > 0;
     } catch (error) {

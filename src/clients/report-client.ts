@@ -10,6 +10,8 @@ import { CommentModel } from "../models/comment-model";
 import { User } from "../models/user-model";
 import { ReportModel, ReportStatus } from "../models/report-model";
 import { PostClient } from "./post-client";
+import { UserClient } from "./user-client";
+import { MailHelper } from "../utils/mail-helper";
 
 export class ReportClient {
   static async createReport(userId: string, postId: string, content?: string): Promise<ObjectId | null> {
@@ -101,7 +103,7 @@ export class ReportClient {
 
       if (status === ReportStatus.ACCEPTED) {
         const filter = { postId: postId };
-        //const updatedPost = PostClient.
+
         const result: UpdateResult = await reportCollection.updateMany(filter, update);
         Logging.info("Report type successfully updated");
 
@@ -111,6 +113,28 @@ export class ReportClient {
       const filter = { _id: new mongoose.Types.ObjectId(reportId) };
 
       const result: UpdateResult = await reportCollection.updateOne(filter, update);
+      Logging.info("Report type successfully updated");
+
+      return result.modifiedCount > 0;
+    } catch (error) {
+      Logging.error(error);
+      return false;
+    }
+  }
+
+  static async deleteUsersReports(userId: string) {
+    try {
+      const db = mongoose.connection.db;
+      const reportCollection = db.collection("report");
+      const update = {
+        $set: {
+          status: ReportStatus.DELETED,
+        },
+      };
+
+      const filter = { userId };
+
+      const result: UpdateResult = await reportCollection.updateMany(filter, update);
       Logging.info("Report type successfully updated");
 
       return result.modifiedCount > 0;
