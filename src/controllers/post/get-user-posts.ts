@@ -21,7 +21,7 @@ const getUserPostsHandler = async (req: Request, res: Response) => {
       retrievedUser = await UserClient.getUserById(userId);
     }
 
-    if (!retrievedUser) {
+    if (userId && !retrievedUser) {
       return ApiHelper.getErrorResponseForCrash(res, "User could not be found");
     }
 
