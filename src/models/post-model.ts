@@ -94,6 +94,9 @@ export class PostResponseDTO {
   ownerDepartment: Departments;
 
   @Expose()
+  ownerUserId: String;
+
+  @Expose()
   @IsEnum(PostStatus)
   status: PostStatus;
 }
@@ -106,5 +109,6 @@ export const mapToPostResponseDTO = (postModel: PostModel, user: User): PostResp
     ownerName: user.name + " " + user.familyName,
     ownerDepartment: user.departmant,
     ownerEmail: user.email,
+    ownerUserId: user._id!.toString(),
   });
 };
