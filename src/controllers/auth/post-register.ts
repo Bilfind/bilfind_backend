@@ -50,9 +50,7 @@ const postRegister = async (req: Request, res: Response) => {
       ]);
     }
 
-    console.log(getTestRequest.password);
     const hashedPassword = HashingHelper.hashPassword(getTestRequest.password);
-    console.log(hashedPassword);
 
     const userId = await UserClient.createUser(
       getTestRequest.email,

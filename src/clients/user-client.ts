@@ -11,11 +11,19 @@ export class UserClient {
       const db = mongoose.connection.db;
       const userCollection = db.collection("user");
 
-      const deleteResult = await userCollection.deleteOne({ email });
+      const filter = { email };
+
+      const update = {
+        $set: {
+          latestStatus: UserStatus.DELETED,
+        },
+      };
+
+      const result: UpdateResult = await userCollection.updateOne(filter, update);
 
       Logging.info("User is retrieved by email", email);
 
-      return deleteResult.deletedCount > 0;
+      return result.modifiedCount > 0;
     } catch (error) {
       Logging.error(error);
       return false;
@@ -27,7 +35,9 @@ export class UserClient {
       const db = mongoose.connection.db;
       const userCollection = db.collection("user");
 
-      const data = await userCollection.findOne({ _id: new mongoose.Types.ObjectId(id) });
+      const data = await userCollection.findOne({
+        _id: new mongoose.Types.ObjectId(id),
+      });
 
       const user: User = Mapper.map(User, data);
       if (!user) {
@@ -49,7 +59,9 @@ export class UserClient {
       const db = mongoose.connection.db;
       const userCollection = db.collection("user");
 
-      const dataCursor = userCollection.find({ _id: { $in: idList.map((id) => new mongoose.Types.ObjectId(id)) } });
+      const dataCursor = userCollection.find({
+        _id: { $in: idList.map((id) => new mongoose.Types.ObjectId(id)) },
+      });
       const users = (await dataCursor.toArray()).map((dataItem) => Mapper.map(User, dataItem));
 
       Logging.info("Users are retrieved by id {}", idList);
@@ -101,8 +113,7 @@ export class UserClient {
       const userCollection = db.collection("user");
 
       const data = await userCollection.findOne({ email });
-
-      console.log(data);
+      //const data = await userCollection.findOne({ email, status: {$ne: "DELETED"} });
 
       const user: User = Mapper.map(User, data);
       if (!user) {
@@ -161,6 +172,8 @@ export class UserClient {
         latestStatus: UserStatus.WAITING,
         favoritePostIds: [],
         ownPostIds: [],
+        ownReportIds: [],
+        isAdmin: false,
       };
 
       const result = await userCollection.insertOne(user);
@@ -229,6 +242,29 @@ export class UserClient {
       const update = {
         $push: {
           ownPostIds: postId,
+        },
+      };
+
+      const result: UpdateResult = await userCollection.updateOne(filter, update);
+      Logging.info("User own posts successfully updated");
+
+      return result.modifiedCount > 0;
+    } catch (error) {
+      Logging.error(error);
+      return false;
+    }
+  }
+
+  static async userPutReport(userId: string, reportId: string) {
+    try {
+      const db = mongoose.connection.db;
+      const userCollection = db.collection("user");
+
+      const filter = { _id: new mongoose.Types.ObjectId(userId) };
+
+      const update = {
+        $push: {
+          ownReportIds: reportId,
         },
       };
 

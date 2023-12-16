@@ -8,6 +8,7 @@ import authRouter from "./routes/auth";
 import cors from "cors";
 import postRouter from "./routes/post";
 import userRouter from "./routes/user";
+import adminRouter from "./routes/admin";
 
 const app: Application = express();
 app.use(express.urlencoded({ extended: true }));
@@ -24,6 +25,8 @@ app.use("/test", testRouter);
 app.use("/auth", authRouter);
 app.use("/post", postRouter);
 app.use("/user", userRouter);
+app.use("/admin", adminRouter);
+
 
 ///// Start Server
 app.listen(config.port, async () => {

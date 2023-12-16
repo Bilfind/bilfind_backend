@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { Mapper } from "../utils/mapper";
 import Logging from "../utils/logging";
 import { ObjectId, UpdateResult } from "mongodb";
-import { PostModel, PostType } from "../models/post-model";
+import { PostModel, PostStatus, PostType } from "../models/post-model";
 import { EditPostRequest } from "../controllers/post/edit-post-handler";
 import { SearchFilterModel } from "../controllers/post/get-post-list-handler";
 import { PostCommentRequest } from "../controllers/post/post-comment-handler";
@@ -115,6 +115,7 @@ export class PostClient {
         images: images,
         createdAt: new Date(),
         isDeleted: false,
+        status: PostStatus.ACTIVE,
       };
 
       const result = await postCollection.insertOne(post);
@@ -130,7 +131,7 @@ export class PostClient {
   static async getPosts(searchFilterModel: SearchFilterModel) {
     const db = mongoose.connection.db;
     const postCollection = db.collection("post");
-    let filter: any = { isDeleted: false };
+    let filter: any = { status: PostStatus.ACTIVE };
 
     if (searchFilterModel.types && searchFilterModel.types.length > 0) {
       filter.type = { $in: searchFilterModel.types };
@@ -186,7 +187,21 @@ export class PostClient {
     const postCollection = db.collection("post");
 
     const objectIdList = postIdList.map((postId) => new mongoose.Types.ObjectId(postId));
-    const filter: any = { isDeleted: false, _id: { $in: objectIdList } };
+    const filter: any = { status: PostStatus.ACTIVE, _id: { $in: objectIdList } };
+
+    const dataCursor = postCollection.find(filter, { sort: { createdAt: -1 } });
+    const posts = (await dataCursor.toArray()).map((dataItem) => Mapper.map(PostModel, dataItem));
+
+    return posts;
+  }
+
+  static async getReportedPost(postIdList: string[]) {
+    const db = mongoose.connection.db;
+    const postCollection = db.collection("post");
+
+    //todo
+    const objectIdList = postIdList.map((postId) => new mongoose.Types.ObjectId(postId));
+    const filter: any = { _id: { $in: objectIdList } };
 
     const dataCursor = postCollection.find(filter, { sort: { createdAt: -1 } });
     const posts = (await dataCursor.toArray()).map((dataItem) => Mapper.map(PostModel, dataItem));
@@ -198,7 +213,7 @@ export class PostClient {
     const db = mongoose.connection.db;
     const postCollection = db.collection("post");
 
-    const filter: any = { isDeleted: false, userId: userId };
+    const filter: any = { status: PostStatus.ACTIVE, userId: userId };
 
     const dataCursor = postCollection.find(filter, { sort: { createdAt: -1 } });
     const posts = (await dataCursor.toArray()).map((dataItem) => Mapper.map(PostModel, dataItem));
@@ -236,7 +251,7 @@ export class PostClient {
       const db = mongoose.connection.db;
       const postCollection = db.collection("post");
 
-      const data = await postCollection.findOne({ _id: new mongoose.Types.ObjectId(id), isDeleted: false });
+      const data = await postCollection.findOne({ _id: new mongoose.Types.ObjectId(id), status: PostStatus.ACTIVE });
 
       const post: PostModel = Mapper.map(PostModel, data);
       if (!post) {
@@ -263,6 +278,7 @@ export class PostClient {
       const update = {
         $set: {
           isDeleted: true,
+          status: PostStatus.DELETED,
         },
       };
 
@@ -291,6 +307,28 @@ export class PostClient {
 
       const result: UpdateResult = await commentCollection.updateMany(filter, update);
       Logging.info("User comments successfully deleted");
+
+      return result.modifiedCount > 0;
+    } catch (error) {
+      Logging.error(error);
+      return false;
+    }
+  }
+
+  static async updatePostStatus(postId: string, status: string) {
+    try {
+      const db = mongoose.connection.db;
+      const postCollection = db.collection("post");
+      const update = {
+        $set: {
+          status: status,
+        },
+      };
+
+      const filter = { _id: new mongoose.Types.ObjectId(postId) };
+
+      const result: UpdateResult = await postCollection.updateOne(filter, update);
+      Logging.info("Post status successfully updated");
 
       return result.modifiedCount > 0;
     } catch (error) {

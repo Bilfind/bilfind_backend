@@ -22,25 +22,29 @@ class PostLoginRequest {
 
 // base endpoint structure
 const postLogin = async (req: Request, res: Response) => {
-  Logging.info(JSON.stringify(req.query, Object.getOwnPropertyNames(req.query)));
+  Logging.info(JSON.stringify(req.body, Object.getOwnPropertyNames(req.body)));
   try {
     const postLoginRequest: PostLoginRequest = Mapper.map(PostLoginRequest, req.body);
 
     const user = await UserClient.getUserByEmail(postLoginRequest.email);
     if (!user) {
-        return ApiHelper.getErrorResponse(res, 403, [{
-            errorCode: ApiErrorCode.EMAIL_DOES_NOT_EXISTS,
-            message: "Email does not exist"
-        }])
+      return ApiHelper.getErrorResponse(res, 403, [
+        {
+          errorCode: ApiErrorCode.EMAIL_DOES_NOT_EXISTS,
+          message: "Email does not exist",
+        },
+      ]);
     }
 
     const isPasswordValid = HashingHelper.comparePassword(postLoginRequest.password, user.hashedPassword);
 
     if (!isPasswordValid) {
-        return ApiHelper.getErrorResponse(res, 403, [{
-            errorCode: ApiErrorCode.WRONG_PASSWORD,
-            message: "Password is not valid."
-        }])
+      return ApiHelper.getErrorResponse(res, 403, [
+        {
+          errorCode: ApiErrorCode.WRONG_PASSWORD,
+          message: "Password is not valid.",
+        },
+      ]);
     }
 
     const token = generateAuthenticationToken(user);
@@ -50,7 +54,11 @@ const postLogin = async (req: Request, res: Response) => {
     }
 
     const userResponseDTO = mapToUserResponseDTO(user);
-    ApiHelper.getSuccessfulResponse(res, { message: "User successfully logged in", user: userResponseDTO, token});
+    ApiHelper.getSuccessfulResponse(res, {
+      message: "User successfully logged in",
+      user: userResponseDTO,
+      token,
+    });
   } catch (error) {
     Logging.error(error);
 
@@ -60,7 +68,5 @@ const postLogin = async (req: Request, res: Response) => {
     ApiHelper.getErrorResponseForCrash(res, JSON.stringify(Object.getOwnPropertyNames(req)));
   }
 };
-
-
 
 export default postLogin;

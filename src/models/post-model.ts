@@ -14,6 +14,12 @@ export enum PostType {
   LOST = "LOST",
 }
 
+export enum PostStatus {
+  ACTIVE = "ACTIVE",
+  DELETED = "DELETED",
+  BANNED = "BANNED",
+}
+
 export class PostModel {
   @Transform((value) => value.obj._id.toString())
   @Expose()
@@ -43,6 +49,10 @@ export class PostModel {
   @Expose()
   @IsEnum(PostType)
   type: PostType;
+
+  @Expose()
+  @IsEnum(PostStatus)
+  status: PostStatus;
 }
 
 export class PostResponseDTO {
@@ -82,15 +92,19 @@ export class PostResponseDTO {
 
   @Expose()
   ownerDepartment: Departments;
+
+  @Expose()
+  @IsEnum(PostStatus)
+  status: PostStatus;
 }
 
 export const mapToPostResponseDTO = (postModel: PostModel, user: User): PostResponseDTO => {
   return Mapper.map(PostResponseDTO, {
-      ...postModel,
-      id: postModel._id!.toString(),
-      ownerPhoto: user.profilePhoto,
-      ownerName: user.name + " " + user.familyName,
-      ownerDepartment: user.departmant,
-      ownerEmail: user.email,
+    ...postModel,
+    id: postModel._id!.toString(),
+    ownerPhoto: user.profilePhoto,
+    ownerName: user.name + " " + user.familyName,
+    ownerDepartment: user.departmant,
+    ownerEmail: user.email,
   });
-}
+};

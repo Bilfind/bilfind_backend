@@ -37,6 +37,12 @@ export class User {
 
   @Expose()
   ownPostIds: string[];
+
+  @Expose()
+  ownReportIds: string[];
+
+  @Expose()
+  isAdmin: boolean;
 }
 
 export class UserResponseDTO {
@@ -69,6 +75,12 @@ export class UserResponseDTO {
 
   @Expose()
   ownPostIds: string[];
+
+  @Expose()
+  ownReportIds: string[];
+
+  @Expose()
+  isAdmin: boolean;
 }
 
 export const mapToUserResponseDTO = (user: User): UserResponseDTO => {
@@ -82,4 +94,5 @@ export enum UserStatus {
   WAITING = "WAITING",
   VERIFIED = "VERIFIED",
   BANNED = "BANNED",
+  DELETED = "DELETED",
 }

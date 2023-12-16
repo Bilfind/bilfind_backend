@@ -1,4 +1,5 @@
 export enum Departments {
+  OTHER,
   AMER,
   ARCH,
   CHEM,
