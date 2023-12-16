@@ -11,9 +11,9 @@ import { mapToPostResponseDTO } from "../../models/post-model";
 const getUserHandler = async (req: Request, res: Response) => {
   Logging.info(JSON.stringify(req.query, Object.getOwnPropertyNames(req.body)));
   try {
-    const { userId } = req.params;
+    const { userId } = req.query;
 
-    if (!userId) {
+    if (!userId || typeof userId !== "string") {
       return ApiHelper.getErrorResponseForCrash(res, "User Id must be given");
     }
 
