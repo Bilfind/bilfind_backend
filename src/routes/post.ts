@@ -15,8 +15,8 @@ const postRouter = express.Router();
 
 postRouter.post("", isAuth, imageUpload.array("image"), createPostHandler);
 postRouter.put("", isAuth, imageUpload.array("image"), editPostHandler);
+postRouter.get("", isAuth, getPostDetailHandler);
 postRouter.delete("", isAuth, deletePostHandler)
-postRouter.get("/:postId/", isAuth, getPostDetailHandler);
 
 postRouter.get("/list", isAuth, getPostListHandler);
 postRouter.get("/user", isAuth, getUserPostsHandler);
@@ -25,4 +25,3 @@ postRouter.delete("/comment", isAuth, deleteCommentHandler);
 postRouter.post("/:postId/report", isAuth, postReportPostHandler);
 
 export default postRouter;
-

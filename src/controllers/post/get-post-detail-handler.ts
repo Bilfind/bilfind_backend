@@ -11,30 +11,34 @@ import { mapToPostResponseDTO } from "../../models/post-model";
 const getPostDetailHandler = async (req: Request, res: Response) => {
   Logging.info(JSON.stringify(req.query, Object.getOwnPropertyNames(req.body)));
   try {
-    const { postId } = req.params;
+    const { postId } = req.query;
 
-    if (!postId) {
-        return ApiHelper.getErrorResponseForCrash(res, "Post Id must be given");
+    if (!postId || typeof postId !== "string") {
+      return ApiHelper.getErrorResponseForCrash(res, "Post Id must be given");
     }
 
     const post = await PostClient.getPostById(postId);
 
     if (!post) {
-        return ApiHelper.getErrorResponseForCrash(res, "Post could not be found");
+      return ApiHelper.getErrorResponseForCrash(res, "Post could not be found");
     }
 
-    const comments = await PostClient.getPostComments(post._id!.toString()); 
-    const commentOwnerIdList = comments.map(comment => comment.userId);
+    const comments = await PostClient.getPostComments(post._id!.toString());
+    const commentOwnerIdList = comments.map((comment) => comment.userId);
     const users = await UserClient.getUsersByListId(commentOwnerIdList);
     const userMap: Record<string, User> = {};
-    users.forEach((user) => userMap[user._id!.toString()] = user);
-    
-    const getCommentDTOList = comments.map(comment => mapToCommentResponseDTO(comment, userMap[comment.userId])); 
-    
+    users.forEach((user) => (userMap[user._id!.toString()] = user));
+
+    const getCommentDTOList = comments.map((comment) => mapToCommentResponseDTO(comment, userMap[comment.userId]));
+
     const owner = await UserClient.getUserById(post.userId);
     const ownerResponseDTO = mapToUserResponseDTO(owner!);
     const postResponseDTO = mapToPostResponseDTO(post, owner!);
-    return ApiHelper.getSuccessfulResponse(res, {post: postResponseDTO, comments: getCommentDTOList, owner: ownerResponseDTO});
+    return ApiHelper.getSuccessfulResponse(res, {
+      post: postResponseDTO,
+      comments: getCommentDTOList,
+      owner: ownerResponseDTO,
+    });
   } catch (error) {
     Logging.error(error);
 
