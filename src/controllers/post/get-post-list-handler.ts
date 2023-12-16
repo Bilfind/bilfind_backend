@@ -8,6 +8,7 @@ import { PostClient } from "../../clients/post-client";
 import { PostModel, PostType, mapToPostResponseDTO } from "../../models/post-model";
 import { UserClient } from "../../clients/user-client";
 import { ObjectId } from "mongodb";
+import { Departments } from "../../utils/enums";
 
 export class SearchFilterModel {
   @Expose()
@@ -24,6 +25,9 @@ export class SearchFilterModel {
 
   @Expose()
   public maxPrice?: number;
+
+  @Expose()
+  public department?: Departments;
 }
 
 // base endpoint structure
@@ -66,6 +70,7 @@ function mapQueryToFilter(query: any): SearchFilterModel {
     types: Array.isArray(query.types) ? query.types : typeof query.types === "string" ? [query.types] : undefined,
     minPrice: query.minPrice ? parseInt(query.minPrice as string) : undefined,
     maxPrice: query.maxPrice ? parseInt(query.maxPrice as string) : undefined,
+    department: query.department as Departments
   };
 }
 

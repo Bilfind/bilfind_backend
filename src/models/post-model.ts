@@ -53,6 +53,9 @@ export class PostModel {
   @Expose()
   @IsEnum(PostStatus)
   status: PostStatus;
+
+  @Expose()
+  department?: Departments;
 }
 
 export class PostResponseDTO {
@@ -99,6 +102,9 @@ export class PostResponseDTO {
   @Expose()
   @IsEnum(PostStatus)
   status: PostStatus;
+
+  @Expose()
+  department?: Departments;
 }
 
 export const mapToPostResponseDTO = (postModel: PostModel, user: User): PostResponseDTO => {

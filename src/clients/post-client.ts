@@ -8,6 +8,7 @@ import { SearchFilterModel } from "../controllers/post/get-post-list-handler";
 import { PostCommentRequest } from "../controllers/post/post-comment-handler";
 import { CommentModel } from "../models/comment-model";
 import { User } from "../models/user-model";
+import { Departments } from "../utils/enums";
 
 export class PostClient {
   static async getCommentById(commentId: string): Promise<CommentModel | null> {
@@ -100,7 +101,8 @@ export class PostClient {
     type: PostType,
     userId: string,
     price?: number,
-    images?: string[]
+    images?: string[],
+    department?: Departments
   ): Promise<ObjectId | null> {
     try {
       const db = mongoose.connection.db;
@@ -116,6 +118,7 @@ export class PostClient {
         createdAt: new Date(),
         isDeleted: false,
         status: PostStatus.ACTIVE,
+        department: department,
       };
 
       const result = await postCollection.insertOne(post);
@@ -147,6 +150,10 @@ export class PostClient {
 
     if (searchFilterModel.types) {
       filter.type = { $in: searchFilterModel.types! };
+    }
+
+    if (searchFilterModel.department) {
+      filter.department = searchFilterModel.department;
     }
 
     if (searchFilterModel.key) {
@@ -233,6 +240,7 @@ export class PostClient {
           content: eidtPostFilter.content,
           price: eidtPostFilter.price ? +eidtPostFilter.price : null,
           images: eidtPostFilter.images,
+          department: eidtPostFilter.department,
         },
       };
 

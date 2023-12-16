@@ -8,6 +8,7 @@ import { User } from "../../models/user-model";
 import { PostClient } from "../../clients/post-client";
 import { Multer } from "multer";
 import { mapToPostResponseDTO } from "../../models/post-model";
+import { Departments } from "../../utils/enums";
 
 export class EditPostRequest {
   @Expose()
@@ -25,6 +26,9 @@ export class EditPostRequest {
 
   @Expose()
   images?: any;
+
+  @Expose()
+  department?: Departments;
 }
 
 // base endpoint structure

@@ -8,6 +8,7 @@ import { User } from "../../models/user-model";
 import { PostClient } from "../../clients/post-client";
 import { PostType, mapToPostResponseDTO } from "../../models/post-model";
 import { UserClient } from "../../clients/user-client";
+import { Departments } from "../../utils/enums";
 
 class CreatePostRequest {
   @Expose()
@@ -24,6 +25,9 @@ class CreatePostRequest {
 
   @Expose()
   price: string;
+
+  @Expose()
+  department: Departments;
 }
 
 // base endpoint structure
@@ -54,7 +58,8 @@ const createPostHandler = async (req: Request, res: Response) => {
       createPostRequest.type,
       userId,
       parseFloat(createPostRequest.price),
-      images
+      images,
+      createPostRequest.department,
     );
 
     if (!createdPostId) {
