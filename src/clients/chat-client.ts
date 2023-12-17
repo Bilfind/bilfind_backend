@@ -19,7 +19,7 @@ export class ChatClient {
         postId,
         createdAt: new Date(),
         messages: [],
-        status: ConversationStatus.WAITING,
+        status: ConversationStatus.ACTIVE,
       };
 
       const result = await conversationCollection.insertOne(conversation);

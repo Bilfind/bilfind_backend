@@ -17,6 +17,9 @@ class CreateConversationRequest {
 }
 
 // base endpoint structure
+// TODO:
+// At first, planned as first conversation is generated as waiting but than it is designed
+// to be Active. Code is not cleaned from old plan yet!
 const CreateConversationHandler = async (req: Request, res: Response) => {
   Logging.info(JSON.stringify(req.body, Object.getOwnPropertyNames(req.body)));
   try {
