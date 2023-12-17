@@ -36,12 +36,12 @@ const putUserEditHandler = async (req: Request, res: Response) => {
       const surname: string = nameWords[nameWords.length - 1];
       const firstname: string = nameWords.slice(0, nameWords.length - 1).join(" ");
 
-      UserClient.updateName(userId, firstname, surname);
+      await UserClient.updateName(userId, firstname, surname);
     }
 
     const dep: any = editPostRequest.department;
     if (dep) {
-      UserClient.updateDepartment(userId, dep);
+      await UserClient.updateDepartment(userId, dep);
     }
 
     const userGetDto = mapToUserResponseDTO(user);

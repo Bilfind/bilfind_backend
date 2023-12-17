@@ -12,6 +12,8 @@ export enum PostType {
   FOUND = "FOUND",
   REQUEST = "REQUEST",
   LOST = "LOST",
+  RENT = "RENT",
+  FORUM = "FORUM"
 }
 
 export enum PostStatus {

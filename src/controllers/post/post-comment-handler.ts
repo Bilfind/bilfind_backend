@@ -69,7 +69,7 @@ const postCommentHandler = async (req: Request, res: Response) => {
 
     if (postOwner.mailSubscription) {
       //todo
-      //MailHelper.sendMailCommentedPostOwner(postOwner.email, user.name, post.title, comment.content.toString());
+      MailHelper.sendMailCommentedPostOwner(postOwner.email, user.name, post.title, comment.content.toString());
     }
 
     if (postCommentRequest.parentId) {
@@ -87,14 +87,14 @@ const postCommentHandler = async (req: Request, res: Response) => {
 
       if (commentOwner.mailSubscription) {
         //todo
-        /*MailHelper.sendMailRepliedCommentOwner(
+        MailHelper.sendMailRepliedCommentOwner(
           commentOwner.email,
           commentOwner.name,
           parentComment.content.toString(),
           comment.content.toString(),
           postOwner.name,
           post.title
-        );*/
+        );
       }
     }
 
