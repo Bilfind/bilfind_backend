@@ -57,6 +57,9 @@ export class CommentResponseDTO {
   ownerEmail: string;
 
   @Expose()
+  ownerId: string;
+
+  @Expose()
   ownerDepartment: Departments;
 }
 
@@ -68,5 +71,6 @@ export const mapToCommentResponseDTO = (commentModel: CommentModel, user: User):
     ownerName: user.name + " " + user.familyName,
     ownerDepartment: user.departmant,
     ownerEmail: user.email,
+    ownerId: user._id!.toString(),
   });
 };

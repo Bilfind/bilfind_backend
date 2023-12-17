@@ -3,10 +3,6 @@ import { ObjectId } from "mongodb";
 import { LocationModel } from "./location-model";
 
 export class MessageModel {
-  @Transform((value) => value.obj._id.toString())
-  @Expose()
-  _id?: ObjectId;
-
   @Expose()
   conversationId: string;
 

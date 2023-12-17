@@ -118,4 +118,26 @@ export class ChatClient {
       return false;
     }
   }
+
+  static async getUserConversations(userId: string) {
+    try {
+      const db = mongoose.connection.db;
+      const conversationCollection = db.collection("conversation");
+
+      const filter = {
+        $or: [{ senderUserId: userId }, { postOwnerUserId: userId }],
+        status: ConversationStatus.ACTIVE,
+      };
+
+      const dataCursor = conversationCollection.find(filter);
+      const conversations = (await dataCursor.toArray()).map((dataItem) => Mapper.map(ConversationModel, dataItem));
+
+      Logging.info("Conversation retrieved by user id {}", userId);
+
+      return conversations;
+    } catch (error) {
+      Logging.error(error);
+      return [];
+    }
+  }
 }

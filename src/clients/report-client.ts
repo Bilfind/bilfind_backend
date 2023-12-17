@@ -53,16 +53,21 @@ export class ReportClient {
   }
 
   static async getReportsByIdList(reportIdList: string[]) {
-    const db = mongoose.connection.db;
-    const reportCollection = db.collection("report");
+    try {
+      const db = mongoose.connection.db;
+      const reportCollection = db.collection("report");
 
-    const objectIdList = reportIdList.map((reportId) => new mongoose.Types.ObjectId(reportId));
-    const filter: any = { _id: { $in: objectIdList } };
+      const objectIdList = reportIdList.map((reportId) => new mongoose.Types.ObjectId(reportId));
+      const filter: any = { _id: { $in: objectIdList } };
 
-    const dataCursor = reportCollection.find(filter, { sort: { createdAt: -1 } });
-    const reports = (await dataCursor.toArray()).map((dataItem) => Mapper.map(ReportModel, dataItem));
+      const dataCursor = reportCollection.find(filter, { sort: { createdAt: -1 } });
+      const reports = (await dataCursor.toArray()).map((dataItem) => Mapper.map(ReportModel, dataItem));
 
-    return reports;
+      return reports;
+    } catch (error) {
+      Logging.error(error);
+      return [];
+    }
   }
 
   static async getReports(): Promise<ReportModel[]> {
