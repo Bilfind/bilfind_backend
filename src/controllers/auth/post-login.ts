@@ -44,7 +44,7 @@ const postLogin = async (req: Request, res: Response) => {
       UserClient.deleteUserByEmail(postLoginRequest.email);
       return ApiHelper.getErrorResponse(res, 401, [
         {
-          errorCode: ApiErrorCode.UNAUTHORIZED,
+          errorCode: ApiErrorCode.EMAIL_DOES_NOT_EXISTS,
           message: "Incomplete registration",
         },
       ]);
@@ -53,7 +53,7 @@ const postLogin = async (req: Request, res: Response) => {
     if (user.latestStatus === UserStatus.BANNED) {
       return ApiHelper.getErrorResponse(res, 401, [
         {
-          errorCode: ApiErrorCode.UNAUTHORIZED,
+          errorCode: ApiErrorCode.BANNED,
           message: "User has been Banned.",
         },
       ]);
