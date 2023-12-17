@@ -26,7 +26,7 @@ const postLogin = async (req: Request, res: Response) => {
   try {
     const postLoginRequest: PostLoginRequest = Mapper.map(PostLoginRequest, req.body);
 
-    if (!postLoginRequest.email.endsWith("@ug.bilkent.edu.tr")) {
+    if (!postLoginRequest.email.endsWith("bilkent.edu.tr")) {
       postLoginRequest.email += "@ug.bilkent.edu.tr";
     }
 

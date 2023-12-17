@@ -150,8 +150,6 @@ export class UserClient {
       const result: UpdateResult = await userCollection.updateOne(filter, update);
       Logging.info("User successfully updated: ", status);
 
-
-
       return result.modifiedCount > 0;
     } catch (error) {
       Logging.error(error);
@@ -370,6 +368,51 @@ export class UserClient {
 
       const result: UpdateResult = await userCollection.updateOne(filter, update);
       Logging.info("User mail subcription successfully updated");
+
+      return result.modifiedCount > 0;
+    } catch (error) {
+      Logging.error(error);
+      return false;
+    }
+  }
+  static async updateName(userId: string, name: string, surname: string) {
+    try {
+      const db = mongoose.connection.db;
+      const userCollection = db.collection("user");
+
+      const filter = { _id: new mongoose.Types.ObjectId(userId) };
+
+      const update = {
+        $set: {
+          name: name,
+          familyName: surname,
+        },
+      };
+
+      const result: UpdateResult = await userCollection.updateOne(filter, update);
+      Logging.info("User name successfully updated");
+
+      return result.modifiedCount > 0;
+    } catch (error) {
+      Logging.error(error);
+      return false;
+    }
+  }
+  static async updateDepartment(userId: string, dep: Departments) {
+    try {
+      const db = mongoose.connection.db;
+      const userCollection = db.collection("user");
+
+      const filter = { _id: new mongoose.Types.ObjectId(userId) };
+
+      const update = {
+        $set: {
+          departmant: dep,
+        },
+      };
+
+      const result: UpdateResult = await userCollection.updateOne(filter, update);
+      Logging.info("User department successfully updated");
 
       return result.modifiedCount > 0;
     } catch (error) {

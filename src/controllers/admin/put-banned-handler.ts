@@ -31,20 +31,20 @@ const putAdminBanHandler = async (req: Request, res: Response) => {
       if (!updateUser) {
         return ApiHelper.getErrorResponseForCrash(res, "User status could not be banned");
       }
-    }
+    } else {
+      const updateUser = await UserClient.updateStatus(user._id!.toString(), UserStatus.BANNED);
+      if (!updateUser) {
+        return ApiHelper.getErrorResponseForCrash(res, "User status could not be banned");
+      }
 
-    const updateUser = await UserClient.updateStatus(user._id!.toString(), UserStatus.BANNED);
-    if (!updateUser) {
-      return ApiHelper.getErrorResponseForCrash(res, "User status could not be banned");
-    }
+      await PostClient.deleteUserPosts(user._id!.toString());
+      await ReportClient.deleteUsersReports(user._id!.toString());
+      await PostClient.deleteUserComments(user._id!.toString());
 
-    await PostClient.deleteUserPosts(user._id!.toString());
-    await ReportClient.deleteUsersReports(user._id!.toString());
-    await PostClient.deleteUserComments(user._id!.toString());
-
-    if (user.mailSubscription) {
-      // ban atılana mail gönder.
-      MailHelper.sendBannedMail(user.email);
+      if (user.mailSubscription) {
+        // ban atılana mail gönder.
+        MailHelper.sendBannedMail(user.email);
+      }
     }
 
     const userGetDto = mapToUserResponseDTO(user);
