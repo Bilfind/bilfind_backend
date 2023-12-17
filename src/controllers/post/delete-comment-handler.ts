@@ -13,28 +13,28 @@ const deleteCommentHandler = async (req: Request, res: Response) => {
     const { commentId } = req.query;
 
     if (!commentId || typeof commentId !== "string") {
-        return ApiHelper.getErrorResponseForCrash(res, "Comment Id must be given");
+      return ApiHelper.getErrorResponseForCrash(res, "Comment Id must be given");
     }
 
     const comment = await PostClient.getCommentById(commentId);
 
     if (!comment) {
-        return ApiHelper.getErrorResponseForCrash(res, "Comment could not be found");
+      return ApiHelper.getErrorResponseForCrash(res, "Comment could not be found");
     }
 
     // @ts-ignore
     const locals = req.locals;
     const user: User = locals.user;
     const userId = user._id!.toString();
-    
+
     if (userId !== comment.userId) {
-        return ApiHelper.getErrorResponseForCrash(res, "Comment does not belong to this user");
+      return ApiHelper.getErrorResponseForCrash(res, "Comment does not belong to this user");
     }
-    
+
     const isDeleted = await PostClient.deleteComment(comment._id!.toString());
 
     if (!isDeleted) {
-        return ApiHelper.getErrorResponseForCrash(res, "Comment could not be deleted");
+      return ApiHelper.getErrorResponseForCrash(res, "Comment could not be deleted");
     }
 
     return ApiHelper.getSuccessfulResponse(res);

@@ -54,7 +54,10 @@ const putVerifyRegistirationOtp = async (req: Request, res: Response) => {
         },
       ]);
     }
-    const successfullyUpdated = await UserClient.updateStatus(user.email, UserStatus.VERIFIED);
+
+    const successfullyUpdated = await UserClient.updateStatus(user._id!.toString(), UserStatus.VERIFIED);
+
+    console.log(successfullyUpdated);
 
     if (successfullyUpdated) {
       user.latestStatus = UserStatus.VERIFIED;

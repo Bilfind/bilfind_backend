@@ -2,28 +2,27 @@ import { Expose, Transform } from "class-transformer";
 import { ObjectId } from "mongodb";
 
 export class Otp {
-    @Transform((value) => value.obj._id.toString())
-    @Expose()
-    _id?: ObjectId;
+  @Transform((value) => value.obj._id.toString())
+  @Expose()
+  _id?: ObjectId;
 
-    @Expose()
-    email: string;
+  @Expose()
+  email: string;
 
-    @Expose()
-    createdAt: Date;
+  @Expose()
+  createdAt: Date;
 
-    @Expose()
-    validUntil: Date;
+  @Expose()
+  validUntil: Date;
 
-    @Expose()
-    code: number;
+  @Expose()
+  code: number;
 
-    @Expose()
-    type: OtpType;
-
+  @Expose()
+  type: OtpType;
 }
 
 export enum OtpType {
-    REGISTER,
-    RESET
+  REGISTER,
+  RESET,
 }

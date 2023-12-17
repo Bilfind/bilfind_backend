@@ -3,11 +3,11 @@ import { Request, Response } from "express";
 import { Mapper } from "../../utils/mapper";
 import { ApiHelper } from "../../utils/api-helper";
 import Logging from "../../utils/logging";
-import { IsString } from "class-validator";
+import { IsEnum, IsString } from "class-validator";
 import { User } from "../../models/user-model";
 import { PostClient } from "../../clients/post-client";
 import { Multer } from "multer";
-import { mapToPostResponseDTO } from "../../models/post-model";
+import { PostCategory, mapToPostResponseDTO } from "../../models/post-model";
 import { Departments } from "../../utils/enums";
 
 export class EditPostRequest {
@@ -29,6 +29,9 @@ export class EditPostRequest {
 
   @Expose()
   department?: Departments;
+
+  @Expose()
+  category?: PostCategory;
 }
 
 // base endpoint structure

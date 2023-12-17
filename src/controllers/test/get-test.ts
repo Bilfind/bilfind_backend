@@ -30,7 +30,7 @@ const getTest = (req: Request, res: Response) => {
       ]);
     }
 
-    ApiHelper.getSuccessfulResponse(res, { message: "successfully passed the test!" , user});
+    ApiHelper.getSuccessfulResponse(res, { message: "successfully passed the test!", user });
   } catch (error) {
     Logging.error(error);
 

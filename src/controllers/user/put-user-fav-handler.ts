@@ -15,8 +15,9 @@ const putUserFavHandler = async (req: Request, res: Response) => {
   try {
     const { postId } = req.query;
 
+    console.log(postId);
     if (!postId || typeof postId !== "string") {
-        return ApiHelper.getErrorResponseForCrash(res, "Post Id must be given");
+      return ApiHelper.getErrorResponseForCrash(res, "Post Id must be given");
     }
 
     // @ts-ignore
@@ -24,26 +25,29 @@ const putUserFavHandler = async (req: Request, res: Response) => {
     const user: User = locals.user;
 
     const post = await PostClient.getPostById(postId);
+    console.log(post);
 
     if (!post) {
       return ApiHelper.getErrorResponseForCrash(res, "Post could not be created");
     }
 
     if (user.favoritePostIds.includes(postId)) {
-        const result = await UserClient.userDeleteFavorite(user._id!.toString(), postId);
+      const result = await UserClient.userDeleteFavorite(user._id!.toString(), postId);
 
-        if (!result) {
-            return ApiHelper.getErrorResponseForCrash(res, "Something went wrong while updating user favorites");
-        }
+      if (!result) {
+        return ApiHelper.getErrorResponseForCrash(res, "Something went wrong while updating user favorites");
+      }
 
-        return ApiHelper.getSuccessfulResponse(res);
-    } 
+      PostClient.updateFavCount(postId, post.favCount - 1);
+      return ApiHelper.getSuccessfulResponse(res);
+    }
 
     const result = await UserClient.userPutFavorite(user._id!.toString(), postId);
     if (!result) {
-        return ApiHelper.getErrorResponseForCrash(res, "Something went wrong while updating user favorites");
+      return ApiHelper.getErrorResponseForCrash(res, "Something went wrong while updating user favorites");
     }
 
+    PostClient.updateFavCount(postId, post.favCount + 1);
     return ApiHelper.getSuccessfulResponse(res);
   } catch (error) {
     Logging.error(error);

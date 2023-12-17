@@ -5,6 +5,7 @@ import Logging from "../utils/logging";
 import { ObjectId, UpdateResult } from "mongodb";
 import { Departments } from "../utils/enums";
 import { MailHelper } from "../utils/mail-helper";
+import { PostClient } from "./post-client";
 
 export class UserClient {
   static async deleteUserByEmail(email: string): Promise<boolean> {
@@ -133,12 +134,12 @@ export class UserClient {
     }
   }
 
-  static async updateStatus(email: string, status: UserStatus): Promise<boolean> {
+  static async updateStatus(userId: string, status: UserStatus): Promise<boolean> {
     try {
       const db = mongoose.connection.db;
       const userCollection = db.collection("user");
 
-      const filter = { email };
+      const filter = { _id: new mongoose.Types.ObjectId(userId) };
 
       const update = {
         $set: {
@@ -149,9 +150,7 @@ export class UserClient {
       const result: UpdateResult = await userCollection.updateOne(filter, update);
       Logging.info("User successfully updated: ", status);
 
-      if (status === UserStatus.BANNED) {
-        MailHelper.sendBannedMail(email);
-      }
+
 
       return result.modifiedCount > 0;
     } catch (error) {
@@ -183,6 +182,7 @@ export class UserClient {
         ownPostIds: [],
         ownReportIds: [],
         isAdmin: false,
+        mailSubscription: true,
       };
 
       const result = await userCollection.insertOne(user);
@@ -348,6 +348,28 @@ export class UserClient {
 
       const result: UpdateResult = await userCollection.updateOne(filter, update);
       Logging.info("User profile photo successfully updated");
+
+      return result.modifiedCount > 0;
+    } catch (error) {
+      Logging.error(error);
+      return false;
+    }
+  }
+  static async updateMailSubscription(userId: string, sub: boolean) {
+    try {
+      const db = mongoose.connection.db;
+      const userCollection = db.collection("user");
+
+      const filter = { _id: new mongoose.Types.ObjectId(userId) };
+
+      const update = {
+        $set: {
+          mailSubscription: sub,
+        },
+      };
+
+      const result: UpdateResult = await userCollection.updateOne(filter, update);
+      Logging.info("User mail subcription successfully updated");
 
       return result.modifiedCount > 0;
     } catch (error) {

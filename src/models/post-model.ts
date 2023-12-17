@@ -20,6 +20,12 @@ export enum PostStatus {
   BANNED = "BANNED",
 }
 
+export enum PostCategory {
+  CLOTHES = "CLOTHES",
+  BOOKS = "BOOKS",
+  ELECTRONIC = "ELECTRONIC",
+}
+
 export class PostModel {
   @Transform((value) => value.obj._id.toString())
   @Expose()
@@ -56,6 +62,12 @@ export class PostModel {
 
   @Expose()
   department?: Departments;
+
+  @Expose()
+  category?: PostCategory;
+
+  @Expose()
+  favCount: number;
 }
 
 export class PostResponseDTO {
@@ -105,6 +117,12 @@ export class PostResponseDTO {
 
   @Expose()
   department?: Departments;
+
+  @Expose()
+  category?: PostCategory;
+
+  @Expose()
+  favCount: number;
 }
 
 export const mapToPostResponseDTO = (postModel: PostModel, user: User): PostResponseDTO => {

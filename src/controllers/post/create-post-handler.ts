@@ -6,7 +6,7 @@ import Logging from "../../utils/logging";
 import { IsEnum, IsString } from "class-validator";
 import { User } from "../../models/user-model";
 import { PostClient } from "../../clients/post-client";
-import { PostType, mapToPostResponseDTO } from "../../models/post-model";
+import { PostCategory, PostType, mapToPostResponseDTO } from "../../models/post-model";
 import { UserClient } from "../../clients/user-client";
 import { Departments } from "../../utils/enums";
 
@@ -28,6 +28,9 @@ class CreatePostRequest {
 
   @Expose()
   department: Departments;
+
+  @Expose()
+  category?: PostCategory;
 }
 
 // base endpoint structure
@@ -60,6 +63,7 @@ const createPostHandler = async (req: Request, res: Response) => {
       parseFloat(createPostRequest.price),
       images,
       createPostRequest.department,
+      createPostRequest.category
     );
 
     if (!createdPostId) {

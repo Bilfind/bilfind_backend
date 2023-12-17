@@ -26,6 +26,10 @@ const postLogin = async (req: Request, res: Response) => {
   try {
     const postLoginRequest: PostLoginRequest = Mapper.map(PostLoginRequest, req.body);
 
+    if (!postLoginRequest.email.endsWith("@ug.bilkent.edu.tr")) {
+      postLoginRequest.email += "@ug.bilkent.edu.tr";
+    }
+
     const user = await UserClient.getUserByEmail(postLoginRequest.email);
     if (!user) {
       return ApiHelper.getErrorResponse(res, 403, [
@@ -36,9 +40,9 @@ const postLogin = async (req: Request, res: Response) => {
       ]);
     }
 
-    if(user.latestStatus === UserStatus.WAITING){
-      UserClient.deleteUserByEmail(postLoginRequest.email)
-      return ApiHelper.getErrorResponse(res, 403, [
+    if (user.latestStatus === UserStatus.WAITING) {
+      UserClient.deleteUserByEmail(postLoginRequest.email);
+      return ApiHelper.getErrorResponse(res, 401, [
         {
           errorCode: ApiErrorCode.UNAUTHORIZED,
           message: "Incomplete registration",
@@ -46,8 +50,8 @@ const postLogin = async (req: Request, res: Response) => {
       ]);
     }
 
-    if(user.latestStatus === UserStatus.BANNED){
-      return ApiHelper.getErrorResponse(res, 403, [
+    if (user.latestStatus === UserStatus.BANNED) {
+      return ApiHelper.getErrorResponse(res, 401, [
         {
           errorCode: ApiErrorCode.UNAUTHORIZED,
           message: "User has been Banned.",

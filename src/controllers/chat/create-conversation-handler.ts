@@ -8,6 +8,7 @@ import { mapToUserResponseDTO, User } from "../../models/user-model";
 import { PostClient } from "../../clients/post-client";
 import { ChatClient } from "../../clients/chat-client";
 import { ConversationStatus } from "../../models/conversation_model";
+import { DtoMapper } from "../../utils/dto-mapper";
 
 class CreateConversationRequest {
   @Expose()
@@ -54,9 +55,16 @@ const CreateConversationHandler = async (req: Request, res: Response) => {
       }
     }
 
+    const dtoMapper = new DtoMapper();
+    const conversationDtoList = await dtoMapper.mapConversationListDto([conversation]);
+
+    if (!conversationDtoList || conversationDtoList.length === 0) {
+      return ApiHelper.getErrorResponseForCrash(res, "Conversation could not be created");
+    }
+
     ApiHelper.getSuccessfulResponse(res, {
       message: "Conversation created",
-      conversation,
+      conversation: conversationDtoList[0],
     });
   } catch (error) {
     Logging.error(error);

@@ -6,6 +6,7 @@ import { PostClient } from "../../clients/post-client";
 import { PostModel, PostResponseDTO, mapToPostResponseDTO } from "../../models/post-model";
 import { ReportModel, mapToReportResponseDTO } from "../../models/report-model";
 import { ReportClient } from "../../clients/report-client";
+import { UserClient } from "../../clients/user-client";
 
 // base endpoint structure
 const getUserReportsHandler = async (req: Request, res: Response) => {
@@ -22,8 +23,13 @@ const getUserReportsHandler = async (req: Request, res: Response) => {
     const postMap: Record<string, PostModel> = {};
     posts.forEach((post) => (postMap[post._id!.toString()] = post));
 
+    const postOwnerIdList = [...posts].map((post) => post.userId);
+    const users = await UserClient.getUsersByListId(postOwnerIdList);
+    const userMap: Record<string, User> = {};
+    users.forEach((user) => (userMap[user._id!.toString()] = user));
+
     const postDTOMap: Record<string, PostResponseDTO> = {};
-    posts.forEach((post) => (postDTOMap[post._id!.toString()] = mapToPostResponseDTO(post, user)));
+    posts.forEach((post) => (postDTOMap[post._id!.toString()] = mapToPostResponseDTO(post, userMap[post.userId])));
 
     const reportsDTOList = reports.map((report) => mapToReportResponseDTO(report, postDTOMap[report.postId]));
 

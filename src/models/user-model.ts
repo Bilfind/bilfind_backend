@@ -43,6 +43,9 @@ export class User {
 
   @Expose()
   isAdmin: boolean;
+
+  @Expose()
+  mailSubscription: boolean;
 }
 
 export class UserResponseDTO {
@@ -81,6 +84,9 @@ export class UserResponseDTO {
 
   @Expose()
   isAdmin: boolean;
+
+  @Expose()
+  mailSubscription: boolean;
 }
 
 export const mapToUserResponseDTO = (user: User): UserResponseDTO => {

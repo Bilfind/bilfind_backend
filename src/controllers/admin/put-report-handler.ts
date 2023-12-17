@@ -22,12 +22,11 @@ const putAdminReportHandler = async (req: Request, res: Response) => {
 
     const report = await ReportClient.getReportById(reportId);
 
-    
     if (!report) {
       return ApiHelper.getErrorResponseForCrash(res, "Report could not be found");
     }
-    
-    const requestedUser = await UserClient.getUserById(report.userId)
+
+    const requestedUser = await UserClient.getUserById(report.userId);
 
     const postId = report.postId;
 
@@ -49,23 +48,23 @@ const putAdminReportHandler = async (req: Request, res: Response) => {
       return ApiHelper.getErrorResponseForCrash(res, "Report status could not be updated");
     }
 
-    // reportu atana mail gönder.
-    MailHelper.sendReportStatusUpdateMail(requestedUser!.email, user.name, status)
-
-
+    if (requestedUser!.mailSubscription) {
+      // reportu atana mail gönder.
+      MailHelper.sendReportStatusUpdateMail(requestedUser!.email, user.name, status);
+    }
 
     if (status === ReportStatus.ACCEPTED) {
       const updatedPost = await PostClient.updatePostStatus(postId, PostStatus.BANNED);
       if (!updatedPost) {
         return ApiHelper.getErrorResponseForCrash(res, "Post status could not be updated");
       }
-      // rapor kabul edildiyse psotu atana psotunun kaldırıldığıan dair mail gonder.
-      MailHelper.sendReportStatusUpdateMailtoPostOwner(user.email,post.title)
+
+      if (user.mailSubscription) {
+        // rapor kabul edildiyse psotu atana psotunun kaldırıldığıan dair mail gonder.
+        MailHelper.sendReportStatusUpdateMailtoPostOwner(user.email, post.title);
+      }
       //UserClient.updateStatus(user.email, UserStatus.BANNED)
     }
-
-
-
 
     const postDTOMap = mapToPostResponseDTO(post, user);
 

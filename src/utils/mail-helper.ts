@@ -1,6 +1,10 @@
 import { createTransport } from "nodemailer";
 import { Otp } from "../models/otp-model";
 import Logging from "./logging";
+import { UserClient } from "../clients/user-client";
+import { ApiHelper } from "./api-helper";
+import { ApiErrorCode } from "./error-codes";
+import { error } from "console";
 
 export class MailHelper {
   public static sendMail(to: string, content: string, subject: string) {
@@ -43,24 +47,44 @@ export class MailHelper {
     this.sendMail(otp.email, content, subject);
   }
 
+  //optional
   public static sendBannedMail(to: string) {
     const content = `Hello from Bilfind!\n\nYou have been banned from BilFind indefinitely. \n\nIf you think there is a problem, please contact us.\n\nThank you for using Bilfind!`;
 
-    const subject = "You are Banned from Bilfind";
+    const subject = "You are Banned from Bilfind!";
     this.sendMail(to, content, subject);
   }
 
   public static sendReportStatusUpdateMail(to: string, reportedName: string, reportStatus: string) {
     const content = `Hello from Bilfind!\n\nWe reviewed ${reportedName}'s post you reported. \n\n Current status of your report: ${reportStatus}.\n\nThank you for using Bilfind!`;
 
-    const subject = "We Reviewed Your Report";
+    const subject = "We Reviewed Your Report!";
     this.sendMail(to, content, subject);
   }
 
-  public static sendReportStatusUpdateMailtoPostOwner(to: string, title: string) {
-    const content = `Hello from Bilfind!\n\nWe reviewed your post with id ${title} and decided to remove it because it does not comply with our community rules.\n\nThank you for using Bilfind!`;
+  public static sendReportStatusUpdateMailtoPostOwner(to: string, postTitle: string) {
+    const content = `Hello from Bilfind!\n\nWe reviewed your post with id ${postTitle} and decided to remove it because it does not comply with our community rules.\n\nThank you for using Bilfind!`;
 
-    const subject = "We removed your post";
+    const subject = "We removed your post!";
+    this.sendMail(to, content, subject);
+  }
+
+  public static sendMailCommentedPostOwner(to: string, userName: string, postTitle: string, comment: string) {
+    const content = `Hello from Bilfind!\n\n ${userName} commented on your post named "${postTitle}":\n\n"${comment}"\n\nThank you for using Bilfind!`;
+    const subject = "You have a comment!";
+    this.sendMail(to, content, subject);
+  }
+
+  public static sendMailRepliedCommentOwner(
+    to: string,
+    userName: string,
+    parentComment: string,
+    comment: string,
+    postOwnerName: string,
+    postTitle: string
+  ) {
+    const content = `Hello from Bilfind!\n\n${userName} responded to your comment "${parentComment}" of ${postOwnerName}'s post named "${postTitle}":\n\n"${comment}"\n\nThank you for using Bilfind!`;
+    const subject = "You have a comment!";
     this.sendMail(to, content, subject);
   }
 }

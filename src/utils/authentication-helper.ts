@@ -117,6 +117,46 @@ export const isAuth = async (req: Request, res: Response, next: NextFunction) =>
   }
 };
 
+export const isAdminAuth = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const token = req.headers["authorization"];
+
+    if (!SECRET_KEY) {
+      Logging.error("SECRET_KEY not found!");
+      return ApiHelper.getErrorResponseForUnauthorized(res);
+    }
+
+    if (!token) {
+      return ApiHelper.getErrorResponseForUnauthorized(res);
+    }
+
+    const bearerToken = token.split(" ")[1];
+    const decodedToken = verify(bearerToken, SECRET_KEY);
+    const tokenMetadata: AuthenticationTokenMetadata = Mapper.map(AuthenticationTokenMetadata, decodedToken);
+
+    const user = await UserClient.getUserById(tokenMetadata.user_id);
+    const locals: RequestLocals = {
+      user: user,
+      email: user?.email,
+    };
+
+    if (tokenMetadata.hashCode !== user?.hashedPassword) {
+      return ApiHelper.getErrorResponseForUnauthorized(res);
+    }
+
+    if (!user.isAdmin) {
+      return ApiHelper.getErrorResponseForUnauthorized(res);
+    }
+
+    // @ts-ignore
+    req.locals = locals;
+
+    next();
+  } catch (error) {
+    return ApiHelper.getErrorResponseForUnauthorized(res);
+  }
+};
+
 export const isResetPasswordAuth = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { resetToken } = req.body;

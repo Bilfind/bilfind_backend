@@ -11,6 +11,10 @@ import { mapToPostResponseDTO } from "../../models/post-model";
 const getUserHandler = async (req: Request, res: Response) => {
   Logging.info(JSON.stringify(req.query, Object.getOwnPropertyNames(req.body)));
   try {
+    // @ts-ignore
+    const locals = req.locals;
+    const requestedUser: User = locals.user;
+
     const { userId } = req.query;
 
     if (!userId || typeof userId !== "string") {
@@ -24,7 +28,11 @@ const getUserHandler = async (req: Request, res: Response) => {
     }
 
     const userDTO = mapToUserResponseDTO(user);
-    userDTO.favoritePostIds = [];
+
+    if (requestedUser._id!.toString() !== user._id!.toString()) {
+      userDTO.favoritePostIds = [];
+    }
+
     return ApiHelper.getSuccessfulResponse(res, {
       user: userDTO,
     });

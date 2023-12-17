@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { Mapper } from "../utils/mapper";
 import Logging from "../utils/logging";
 import { ObjectId, UpdateResult } from "mongodb";
-import { PostModel, PostStatus, PostType } from "../models/post-model";
+import { PostCategory, PostModel, PostStatus, PostType } from "../models/post-model";
 import { EditPostRequest } from "../controllers/post/edit-post-handler";
 import { SearchFilterModel } from "../controllers/post/get-post-list-handler";
 import { PostCommentRequest } from "../controllers/post/post-comment-handler";
@@ -102,7 +102,8 @@ export class PostClient {
     userId: string,
     price?: number,
     images?: string[],
-    department?: Departments
+    department?: Departments,
+    category?: PostCategory
   ): Promise<ObjectId | null> {
     try {
       const db = mongoose.connection.db;
@@ -119,6 +120,8 @@ export class PostClient {
         isDeleted: false,
         status: PostStatus.ACTIVE,
         department: department,
+        category: category,
+        favCount: 0,
       };
 
       const result = await postCollection.insertOne(post);
@@ -142,6 +145,10 @@ export class PostClient {
 
     if (searchFilterModel.minPrice !== undefined) {
       filter.price = { $gte: searchFilterModel.minPrice };
+    }
+
+    if (searchFilterModel.category) {
+      filter.category = searchFilterModel.category;
     }
 
     if (searchFilterModel.maxPrice !== undefined) {
@@ -241,6 +248,7 @@ export class PostClient {
           price: eidtPostFilter.price ? +eidtPostFilter.price : null,
           images: eidtPostFilter.images,
           department: eidtPostFilter.department,
+          category: eidtPostFilter.category,
         },
       };
 
@@ -330,6 +338,28 @@ export class PostClient {
       const update = {
         $set: {
           status: status,
+        },
+      };
+
+      const filter = { _id: new mongoose.Types.ObjectId(postId) };
+
+      const result: UpdateResult = await postCollection.updateOne(filter, update);
+      Logging.info("Post status successfully updated");
+
+      return result.modifiedCount > 0;
+    } catch (error) {
+      Logging.error(error);
+      return false;
+    }
+  }
+  static async updateFavCount(postId: string, res: number) {
+    try {
+      const db = mongoose.connection.db;
+      const postCollection = db.collection("post");
+
+      const update = {
+        $set: {
+          favCount: res,
         },
       };
 
