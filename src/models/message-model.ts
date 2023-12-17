@@ -3,37 +3,34 @@ import { ObjectId } from "mongodb";
 import { LocationModel } from "./location-model";
 
 export class MessageModel {
-    @Transform((value) => value.obj._id.toString())
-    @Expose()
-    _id?: ObjectId;
+  @Transform((value) => value.obj._id.toString())
+  @Expose()
+  _id?: ObjectId;
 
-    @Expose()
-    conversationId: string;
+  @Expose()
+  conversationId: string;
 
-    @Expose()
-    senderId: string;
+  @Expose()
+  senderId: string;
 
-    @Expose()
-    receiverId: string;
+  @Expose()
+  createdAt: Date;
 
-    @Expose()
-    createdAt: string;
+  @Expose()
+  text?: string;
 
-    @Expose()
-    text?: string;
+  @Expose()
+  imageSrc?: string;
 
-    @Expose()
-    imageSrc?: string;
+  @Expose()
+  location?: LocationModel;
 
-    @Expose()
-    location?: LocationModel;
-
-    @Expose()
-    messageType: MessageType;
+  @Expose()
+  messageType: MessageType;
 }
 
-enum MessageType {
-    TEXT,
-    IMAGE,
-    LOCATION
+export enum MessageType {
+  TEXT = "TEXT",
+  IMAGE = "IMAGE",
+  LOCATION = "LOCATION",
 }

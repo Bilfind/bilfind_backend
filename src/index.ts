@@ -9,6 +9,8 @@ import cors from "cors";
 import postRouter from "./routes/post";
 import userRouter from "./routes/user";
 import adminRouter from "./routes/admin";
+import { SocketServer } from "./socket/socket_server";
+import chatRouter from "./routes/chat";
 
 const app: Application = express();
 app.use(express.urlencoded({ extended: true }));
@@ -26,10 +28,10 @@ app.use("/auth", authRouter);
 app.use("/post", postRouter);
 app.use("/user", userRouter);
 app.use("/admin", adminRouter);
-
+app.use("/chat", chatRouter);
 
 ///// Start Server
-app.listen(config.port, async () => {
+const server = app.listen(config.port, async () => {
   const connected = await connectDatabase();
   if (connected) {
     Logging.info(`Server is running at port ${config.port}`);
@@ -47,3 +49,6 @@ const connectDatabase = async () => {
     return false;
   }
 };
+
+const socketServer = new SocketServer();
+socketServer.connect(server);

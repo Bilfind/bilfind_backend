@@ -2,16 +2,7 @@ import mongoose from "mongoose";
 import { Mapper } from "../utils/mapper";
 import Logging from "../utils/logging";
 import { ObjectId, UpdateResult } from "mongodb";
-import { PostModel, PostStatus, PostType } from "../models/post-model";
-import { EditPostRequest } from "../controllers/post/edit-post-handler";
-import { SearchFilterModel } from "../controllers/post/get-post-list-handler";
-import { PostCommentRequest } from "../controllers/post/post-comment-handler";
-import { CommentModel } from "../models/comment-model";
-import { User } from "../models/user-model";
 import { ReportModel, ReportStatus } from "../models/report-model";
-import { PostClient } from "./post-client";
-import { UserClient } from "./user-client";
-import { MailHelper } from "../utils/mail-helper";
 
 export class ReportClient {
   static async createReport(userId: string, postId: string, content?: string): Promise<ObjectId | null> {
