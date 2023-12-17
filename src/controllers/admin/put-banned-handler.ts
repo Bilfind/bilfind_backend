@@ -19,10 +19,11 @@ const putAdminBanHandler = async (req: Request, res: Response) => {
     // @ts-ignore
     const { userId } = req.params;
 
+    console.log(userId);
     const user = await UserClient.getUserById(userId);
 
     if (!user) {
-      return ApiHelper.getErrorResponseForCrash(res, "Report could not be found");
+      return ApiHelper.getErrorResponseForCrash(res, "User could not be found");
     }
 
     if (user.latestStatus === UserStatus.BANNED) {
@@ -36,6 +37,10 @@ const putAdminBanHandler = async (req: Request, res: Response) => {
     if (!updateUser) {
       return ApiHelper.getErrorResponseForCrash(res, "User status could not be banned");
     }
+
+    await PostClient.deleteUserPosts(user._id!.toString());
+    await ReportClient.deleteUsersReports(user._id!.toString());
+    await PostClient.deleteUserComments(user._id!.toString());
 
     if (user.mailSubscription) {
       // ban atılana mail gönder.

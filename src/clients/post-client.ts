@@ -190,7 +190,14 @@ export class PostClient {
     console.log(searchFilterModel);
     console.log(filter.$or);
 
-    const dataCursor = postCollection.find(filter, { sort: { createdAt: -1 } });
+    if (!searchFilterModel.page) {
+      searchFilterModel.page = 0;
+    }
+
+    const dataCursor = postCollection
+      .find(filter, { sort: { createdAt: -1 } })
+      .skip(searchFilterModel.page * 36)
+      .limit(36);
     const posts = (await dataCursor.toArray()).map((dataItem) => Mapper.map(PostModel, dataItem));
 
     return posts;

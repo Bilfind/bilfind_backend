@@ -32,6 +32,9 @@ export class SearchFilterModel {
 
   @Expose()
   category?: PostCategory;
+
+  @Expose()
+  page?: number;
 }
 
 // base endpoint structure
@@ -74,8 +77,9 @@ function mapQueryToFilter(query: any): SearchFilterModel {
     types: Array.isArray(query.types) ? query.types : typeof query.types === "string" ? [query.types] : undefined,
     minPrice: query.minPrice ? parseInt(query.minPrice as string) : undefined,
     maxPrice: query.maxPrice ? parseInt(query.maxPrice as string) : undefined,
-    department: query.department ? (query.departmant as Departments) : undefined,
+    department: query.department ? (query.department as Departments) : undefined,
     category: query.category ? (query.category as PostCategory) : undefined,
+    page: query.page ? parseInt(query.page as string) : undefined,
   };
 }
 

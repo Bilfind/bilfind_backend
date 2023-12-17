@@ -10,7 +10,7 @@ import putAdminBanHandler from "../controllers/admin/put-banned-handler";
 const adminRouter = express.Router();
 
 adminRouter.get("/report", isAdminAuth, getReportHandler);
-adminRouter.put("/:reportId/:status", isAdminAuth, putAdminReportHandler);
 adminRouter.put("/:userId/ban", isAdminAuth, putAdminBanHandler);
+adminRouter.put("/:reportId/:status", isAdminAuth, putAdminReportHandler);
 
 export default adminRouter;
