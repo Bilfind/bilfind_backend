@@ -276,7 +276,7 @@ export class PostClient {
 
       const data = await postCollection.findOne({
         _id: new mongoose.Types.ObjectId(id),
-        status: { $in: [PostStatus.BANNED, PostStatus.ACTIVE, PostStatus.DELETED] },
+        status:  PostStatus.ACTIVE,
       });
 
       const post: PostModel = Mapper.map(PostModel, data);

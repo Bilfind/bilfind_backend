@@ -4,6 +4,7 @@ import { sendLog } from "./client_send_log";
 import { ChatClient } from "../../clients/chat-client";
 import { UserClient } from "../../clients/user-client";
 import { User } from "../../models/user-model";
+import { MailHelper } from "../../utils/mail-helper";
 
 export class SendMessageData {
   @Expose()
@@ -35,6 +36,16 @@ export const sendMessage = async (data: SendMessageData, socket: Socket) => {
       return;
     }
 
+    const receiverId =
+      conversation?.senderUserId === user._id!.toString()
+        ? conversation.postOwnerUserId!.toString()
+        : conversation?.senderUserId!.toString();
+
+    const receiverUser = await UserClient.getUserById(receiverId!.toString());
+
+    if (conversation.messages.length > 0 && receiverUser && receiverUser.mailSubscription) {
+      MailHelper.sendFirstMessageMail(receiverUser.email, user.name, data.content);
+    }
     await ChatClient.insertMessage(data.conversationId, data.userId, data.content);
     sendLog("Message successfully saved to database.", socket);
   } catch (error: any) {

@@ -3,7 +3,7 @@ import { ApiHelper } from "./api-helper";
 import { verify, sign } from "jsonwebtoken";
 import Logging from "./logging";
 import { UserClient } from "../clients/user-client";
-import { User } from "../models/user-model";
+import { User, UserStatus } from "../models/user-model";
 import { Expose } from "class-transformer";
 import { IsString } from "class-validator";
 import { Mapper } from "./mapper";
@@ -110,6 +110,10 @@ export const isAuth = async (req: Request, res: Response, next: NextFunction) =>
 
     // @ts-ignore
     req.locals = locals;
+
+    if (user.latestStatus === UserStatus.BANNED) {
+      return ApiHelper.getErrorResponseForUnauthorized(res);
+    }
 
     next();
   } catch (error) {

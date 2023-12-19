@@ -87,4 +87,10 @@ export class MailHelper {
     const subject = "You have a comment!";
     this.sendMail(to, content, subject);
   }
+
+  public static sendFirstMessageMail(to: string, sender: string, text: string) {
+    const content = `Hello from Bilfind!\n\n${sender} sent you a private message :\n\n"${text}"\n\nThank you for using Bilfind!`;
+    const subject = "You have a message!";
+    this.sendMail(to, content, subject);
+  }
 }
