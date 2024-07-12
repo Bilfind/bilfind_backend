@@ -52,3 +52,12 @@ const connectDatabase = async () => {
 
 const socketServer = new SocketServer();
 socketServer.connect(server);
+
+setInterval(() => {
+  const memoryUsage = process.memoryUsage();
+  console.log(
+    `Memory Usage: RSS = ${memoryUsage.rss / 1024 / 1024} MB, Heap Total = ${
+      memoryUsage.heapTotal / 1024 / 1024
+    } MB, Heap Used = ${memoryUsage.heapUsed / 1024 / 1024} MB`
+  );
+}, 1000);
